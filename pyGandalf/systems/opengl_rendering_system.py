@@ -75,6 +75,12 @@ class OpenGLStaticMeshRenderingSystem(System):
         mesh.batch = OpenGLRenderer().add_batch(mesh, material)
 
     def on_update_system(self, ts: float):
+        for components in self.get_filtered_components():
+            mesh, entity_material, transform = components
+            if mesh.changed:
+                self.on_create_entity(mesh, components)
+                mesh.changed = False
+
         if OpenGLRenderer().get_shadows_enabled():
             # Create the depth only pre-pass material is not already created
             if self.pre_pass_material == None:
@@ -234,6 +240,54 @@ class OpenGLStaticMeshRenderingSystem(System):
 
         if material.instance.has_uniform('u_Color'):
             material.instance.set_uniform('u_Color', material.instance.data.color.rgb)
+
+        if material.instance.has_uniform('elevationScale'):
+            material.instance.set_uniform('elevationScale', float(material.instance.data.elevationScale))
+
+        if material.instance.has_uniform('mapSize'):
+            material.instance.set_uniform('mapSize', int(material.instance.data.mapSize - 1))
+
+        if material.instance.has_uniform('metallic'):
+            material.instance.set_uniform('metallic', material.instance.data.metallic)
+
+        if material.instance.has_uniform('roughness'):
+            material.instance.set_uniform('roughness', material.instance.data.roughness)
+
+        if material.instance.has_uniform('ao'):
+            material.instance.set_uniform('ao', material.instance.data.ao)
+
+        if material.instance.has_uniform('_Height_of_blend'):
+            material.instance.set_uniform('_Height_of_blend', material.instance.data.heightOfBlend)
+
+        if material.instance.has_uniform('_Depth'):
+            material.instance.set_uniform('_Depth', material.instance.data.depthOfBlend)
+
+        if material.instance.has_uniform('maxHeight'):
+            material.instance.set_uniform('maxHeight', material.instance.data.maxHeight)
+            
+        if material.instance.has_uniform('heightOfSnow'):
+            material.instance.set_uniform('heightOfSnow', material.instance.data.heightOfSnow)
+                    
+        if material.instance.has_uniform('heightOfGrass'):
+            material.instance.set_uniform('heightOfGrass', material.instance.data.heightOfGrass)
+            
+        if material.instance.has_uniform('rockColor'):
+            material.instance.set_uniform('rockColor', material.instance.data.rockColor.rgba)
+            
+        if material.instance.has_uniform('rockBlendAmount'):
+            material.instance.set_uniform('rockBlendAmount', material.instance.data.rockBlendAmount)
+            
+        if material.instance.has_uniform('slopeTreshold'):
+            material.instance.set_uniform('slopeTreshold', material.instance.data.slopeTreshold)
+            
+        if material.instance.has_uniform('snowColor'):
+            material.instance.set_uniform('snowColor', material.instance.data.snowColor.rgba)
+            
+        if material.instance.has_uniform('grassColor'):
+            material.instance.set_uniform('grassColor', material.instance.data.grassColor.rgba)
+            
+        if material.instance.has_uniform('sandColor'):
+            material.instance.set_uniform('sandColor', material.instance.data.sandColor.rgba)
 
         if material.instance.has_uniform('u_Time'):
             material.instance.set_uniform('u_Time', float(glfw.get_time()))

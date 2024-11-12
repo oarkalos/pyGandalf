@@ -4,6 +4,7 @@ layout(vertices=4) out;
 
 uniform mat4 u_Model;
 uniform mat4 u_View;
+uniform int mapSize;
 
 in vec2 v_TexCoord[];
 out vec2 v_TextureCoord[];
@@ -22,24 +23,26 @@ void main()
         // ----------------------------------------------------------------------
         // Step 1: define constants to control tessellation parameters
 	    // set these as desired for your world scale
-        const int MIN_TESS_LEVEL = 4;
-        const int MAX_TESS_LEVEL = 64;
-        const float MIN_DISTANCE = 20;
-        const float MAX_DISTANCE = 800;
+        const int MIN_TESS_LEVEL = 1;
+        int MAX_TESS_LEVEL = mapSize;
+        const float MIN_DISTANCE = 60;
+        const float MAX_DISTANCE = 200;
+        float distRange = MAX_DISTANCE-MIN_DISTANCE;
+        mat4 viewModel = u_View * u_Model;
 
         // ----------------------------------------------------------------------
         // Step 2: transform each vertex into eye space
-        vec4 eyeSpacePos00 = u_View * u_Model * gl_in[0].gl_Position;
-        vec4 eyeSpacePos01 = u_View * u_Model * gl_in[1].gl_Position;
-        vec4 eyeSpacePos10 = u_View * u_Model * gl_in[2].gl_Position;
-        vec4 eyeSpacePos11 = u_View * u_Model * gl_in[3].gl_Position;
+        vec4 eyeSpacePos00 = viewModel * gl_in[0].gl_Position;
+        vec4 eyeSpacePos01 = viewModel * gl_in[1].gl_Position;
+        vec4 eyeSpacePos10 = viewModel * gl_in[2].gl_Position;
+        vec4 eyeSpacePos11 = viewModel * gl_in[3].gl_Position;
 
         // ----------------------------------------------------------------------
         // Step 3: "distance" from camera scaled between 0 and 1
-        float distance00 = clamp( (abs(eyeSpacePos00.z) - MIN_DISTANCE) / (MAX_DISTANCE-MIN_DISTANCE), 0.0, 1.0 );
-        float distance01 = clamp( (abs(eyeSpacePos01.z) - MIN_DISTANCE) / (MAX_DISTANCE-MIN_DISTANCE), 0.0, 1.0 );
-        float distance10 = clamp( (abs(eyeSpacePos10.z) - MIN_DISTANCE) / (MAX_DISTANCE-MIN_DISTANCE), 0.0, 1.0 );
-        float distance11 = clamp( (abs(eyeSpacePos11.z) - MIN_DISTANCE) / (MAX_DISTANCE-MIN_DISTANCE), 0.0, 1.0 );
+        float distance00 = clamp( (abs(eyeSpacePos00.z) - MIN_DISTANCE) / distRange, 0.0, 1.0 );
+        float distance01 = clamp( (abs(eyeSpacePos01.z) - MIN_DISTANCE) / distRange, 0.0, 1.0 );
+        float distance10 = clamp( (abs(eyeSpacePos10.z) - MIN_DISTANCE) / distRange, 0.0, 1.0 );
+        float distance11 = clamp( (abs(eyeSpacePos11.z) - MIN_DISTANCE) / distRange, 0.0, 1.0 );
 
         // ----------------------------------------------------------------------
         // Step 4: interpolate edge tessellation level based on closer vertex

@@ -84,6 +84,7 @@ class StaticMeshComponent(Component):
         self.render_pipeline = None
         self.buffers = []
         self.index_buffer = None
+        self.changed = False
 
         self.batch = -1
         self.load_from_file = True if attributes == None else False
@@ -124,3 +125,29 @@ class WebGPUComputeComponent(Component):
         self.output: list[bytearray] = []
         self.output_ready = False
         self.dispatch = False
+
+class TerrainComponent(Component):
+    def __init__(self, scale, elevationScale, mapSize, fallOffEnabled, fallOffType, a, b, fallOffHeight, patch_resolution, vertices_per_patch, gpu):
+        self.noiseLayers = []
+        self.minHeight = 0.0
+        self.maxHeight = 0.0
+        self.scale : float = scale
+        self.elevationScale : float = elevationScale
+        self.mapSize : int = mapSize
+        self.fallOffEnabled : bool = fallOffEnabled
+        self.fallOffType : int = fallOffType
+        self.patch_resolution : int = patch_resolution
+        self.vertices_per_patch : int = vertices_per_patch
+
+        self.a : float = a
+        self.b : float = b
+        self.fallOffHeight : float = fallOffHeight
+        self.generate: bool = False
+
+        self.minTerrainHeight = []
+        self.maxTerrainHeight = []
+        self.heightMap = []
+        self.heights = []
+        self.vertices = []
+        self.indices = []
+        self.gpu: bool = gpu

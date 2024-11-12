@@ -350,6 +350,50 @@ class EditorPanelSystem(System):
                     imgui.tree_pop()
                 imgui.separator()
 
+            if SceneManager().get_active_scene().has_component(EditorVisibleComponent.SELECTED_ENTITY, TerrainComponent):
+                if imgui.tree_node_ex('TerrainComponent', flags):
+                    terrain: TerrainComponent = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, TerrainComponent)
+                    material: MaterialComponent = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, MaterialComponent)
+                    scaleChanged, newScale = imgui.input_int('Scale', terrain.scale, 1)
+                    elevationScaleChanged, newElevationScale = imgui.input_int('Elevation Scale', terrain.elevationScale, 1)
+                    fallOffChanged, newFallOff = imgui.checkbox('Enable fall off', terrain.fallOffEnabled)
+                    typeChanged, newType = imgui.combo('Fall off type', int(terrain.fallOffType), ['Circle', 'Rectangle'])
+                    aChanged, newA = imgui.drag_float('a', terrain.a, 0.01)
+                    bChanged, newB = imgui.drag_float('b', terrain.b, 0.01)
+                    terrainChanged, newMapSize = imgui.drag_int('Map size', terrain.mapSize, 8, 8, 512)
+                    gpuChanged, newGPU = imgui.checkbox('GPU accelerated noise', terrain.gpu)
+                    for layer in terrain.noiseLayers:
+                        if imgui.tree_node_ex(layer.name, flags):
+                            seedChanged, newSeed = imgui.input_int('Seed', layer.seed, 1)
+                            octavesChanged, newOctaves = imgui.input_int('Ocatves', layer.octaves, 1)
+                            frequencyChanged, newFrequency = imgui.drag_float('Frequency', layer.frequency, 0.01)
+                            persistenceChanged, newPersistence = imgui.drag_float('Persistence', layer.persistence, 0.01)
+                            lacunarityChanged, newLacunarity = imgui.drag_float('Lacunarity', layer.lacunarity, 0.01)
+                            if seedChanged: layer.seed = newSeed
+                            if octavesChanged: layer.octaves = newOctaves
+                            if frequencyChanged: layer.frequency = newFrequency
+                            if persistenceChanged: layer.persistence = newPersistence
+                            if lacunarityChanged: layer.lacunarity = newLacunarity
+                            imgui.tree_pop()
+                        imgui.separator()
+                    imgui.button('Generate Terrain', imgui.ImVec2(60, 10))
+                    if imgui.is_item_clicked():
+                        terrain.generate = True
+                        if material.instance.has_uniform('elevationScale'):
+                            material.instance.data.elevationScale = terrain.elevationScale
+                        if material.instance.has_uniform('mapSize'):
+                            material.instance.data.mapSize = terrain.mapSize / 8
+                    if scaleChanged: terrain.scale = newScale
+                    if elevationScaleChanged: terrain.elevationScale = newElevationScale
+                    if fallOffChanged: terrain.fallOffEnabled = newFallOff
+                    if typeChanged: terrain.fallOffType = newType
+                    if aChanged: terrain.a = newA
+                    if bChanged: terrain.b = newB
+                    if terrainChanged: terrain.mapSize = newMapSize
+                    if gpuChanged: terrain.gpu = newGPU
+                    imgui.tree_pop()
+                imgui.separator()
+
             if SceneManager().get_active_scene().has_component(EditorVisibleComponent.SELECTED_ENTITY, StaticMeshComponent):
                 if imgui.tree_node_ex('StaticMeshComponent', flags):
                     static_mesh: StaticMeshComponent = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, StaticMeshComponent)
@@ -422,6 +466,62 @@ class EditorPanelSystem(System):
                     if material.instance.has_uniform('u_Color'):
                         color_changed, new_color = imgui.color_edit4('color', material.instance.data.color)
                         if color_changed: material.instance.data.color = glm.vec4(new_color[0], new_color[1], new_color[2], new_color[3])
+                    
+                    if material.instance.has_uniform('metallic'):
+                        metallic_changed, new_metallic = imgui.drag_float('metallic', material.instance.data.metallic, 0.01, 0.0, 1.0)
+                        if metallic_changed: material.instance.data.metallic = new_metallic
+
+                    if material.instance.has_uniform('roughness'):
+                        roughness_changed, new_roughness = imgui.drag_float('roughness', material.instance.data.roughness, 0.01, 0.0, 1.0)
+                        if roughness_changed: material.instance.data.roughness = new_roughness
+
+                    if material.instance.has_uniform('ao'):
+                        ao_changed, new_ao = imgui.drag_float('ao', material.instance.data.ao, 0.01, 0.0, 1.0)
+                        if ao_changed: material.instance.data.ao = new_ao
+
+                    if material.instance.has_uniform('_Height_of_blend'):
+                        height_of_blend_changed, new_height_of_blend = imgui.drag_float('_Height_of_blend', material.instance.data.heightOfBlend, 0.01, 0.0, 10.0)
+                        if height_of_blend_changed: material.instance.data.heightOfBlend = new_height_of_blend
+
+                    if material.instance.has_uniform('_Depth'):
+                        depth_changed, new_depth = imgui.drag_float('_Depth', material.instance.data.depthOfBlend, 0.01, 0.0, 10.0)
+                        if depth_changed: material.instance.data.depthOfBlend = new_depth
+
+                    if material.instance.has_uniform('maxHeight'):
+                        maxHeightChanged, newMaxHeight = imgui.drag_float('maxHeight', material.instance.data.maxHeight, 0.1, 0.0)
+                        if maxHeightChanged: material.instance.data.maxHeight = newMaxHeight
+
+                    if material.instance.has_uniform('heightOfSnow'):
+                        heightSnowChanged, newHeightSnow = imgui.drag_float('heightOfSnow', material.instance.data.heightOfSnow, 0.01, 0.0, 10.0)
+                        if heightSnowChanged: material.instance.data.heightOfSnow = newHeightSnow
+                                
+                    if material.instance.has_uniform('heightOfGrass'):
+                        heightGrassChanged, newHeightGrass = imgui.drag_float('heightOfGrass', material.instance.data.heightOfGrass, 0.01, 0.0, 10.0)
+                        if heightGrassChanged: material.instance.data.heightOfGrass = newHeightGrass
+                        
+                    if material.instance.has_uniform('rockColor'):
+                        rockColorChanged, newRockColor = imgui.color_edit3('rockColor', material.instance.data.rockColor.rgb)
+                        if rockColorChanged: material.instance.data.rockColor = glm.vec4(newRockColor[0], newRockColor[1], newRockColor[2], 1.0)
+                        
+                    if material.instance.has_uniform('rockBlendAmount'):
+                        rockBlendAmountChanged, newRockBlendAmount = imgui.drag_float('rockBlendAmount', material.instance.data.rockBlendAmount, 0.01, 0.0)
+                        if rockBlendAmountChanged: material.instance.data.rockBlendAmount = newRockBlendAmount
+                        
+                    if material.instance.has_uniform('slopeTreshold'):
+                        slopeThresholdChanged, newSlopeTreshold = imgui.drag_float('slopeTreshold', material.instance.data.slopeTreshold, 0.01, 0.0, 1.0)
+                        if slopeThresholdChanged: material.instance.data.slopeTreshold = newSlopeTreshold
+                        
+                    if material.instance.has_uniform('snowColor'):
+                        snowColorChanged, newSnowColor = imgui.color_edit3('snowColor', material.instance.data.snowColor.rgb)
+                        if snowColorChanged: material.instance.data.snowColor = glm.vec4(newSnowColor[0], newSnowColor[1], newSnowColor[2], 1.0)
+                        
+                    if material.instance.has_uniform('grassColor'):
+                        grassColorChanged, newGrassColor = imgui.color_edit3('grassColor', material.instance.data.grassColor.rgb)
+                        if grassColorChanged: material.instance.data.grassColor = glm.vec4(newGrassColor[0], newGrassColor[1], newGrassColor[2], 1.0)
+                        
+                    if material.instance.has_uniform('sandColor'):
+                        sandColorChanged, newSandColor = imgui.color_edit3('sandColor', material.instance.data.sandColor.rgb)
+                        if sandColorChanged: material.instance.data.sandColor = glm.vec4(newSandColor[0], newSandColor[1], newSandColor[2], 1.0)
 
                     # Get uniform textures
                     textures = OpenGLMaterialLib().get_textures(material.instance.name)

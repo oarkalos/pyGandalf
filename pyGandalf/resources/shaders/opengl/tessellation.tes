@@ -4,15 +4,19 @@
 layout (quads, fractional_odd_spacing, ccw) in;
 
 uniform sampler2D u_HeightMap;  // the texture corresponding to our height map
+uniform sampler2D normal_map;
 uniform mat4 u_Model;           // the model matrix
 uniform mat4 u_View;            // the view matrix
 uniform mat4 u_Projection;      // the projection matrix
+uniform float elevationScale;
 
 // received from Tessellation Control Shader - all texture coordinates for the patch vertices
 in vec2 v_TextureCoord[];
 
 // send to Fragment Shader for coloring
-out float v_Height;
+out vec3 v_Position;
+out vec3 v_Normal;
+out vec2 v_TexCoord;
 
 void main()
 {
@@ -31,9 +35,10 @@ void main()
     vec2 t0 = (t01 - t00) * u + t00;
     vec2 t1 = (t11 - t10) * u + t10;
     vec2 texCoord = (t1 - t0) * v + t0;
+    v_TexCoord = texCoord;
 
     // lookup texel at patch coordinate for height and scale + shift as desired
-    v_Height = texture(u_HeightMap, texCoord).y * 64.0 - 16.0;
+    float v_Height = texture(u_HeightMap, texCoord).y * elevationScale - 16.0;
 
     // ----------------------------------------------------------------------
     // retrieve control point position coordinates
@@ -54,6 +59,8 @@ void main()
 
     // displace point along normal
     p += normal * v_Height;
+    v_Position = p.xyz;
+    v_Normal = texture(normal_map, texCoord).xyz;
 
     // ----------------------------------------------------------------------
     // output patch point position in clip space
