@@ -241,12 +241,51 @@ class OpenGLStaticMeshRenderingSystem(System):
         if material.instance.has_uniform('u_Color'):
             material.instance.set_uniform('u_Color', material.instance.data.color.rgb)
 
+        if material.instance.has_uniform('scale'):
+            material.instance.set_uniform('scale', int(material.instance.data.scale))
+
         if material.instance.has_uniform('elevationScale'):
-            material.instance.set_uniform('elevationScale', float(material.instance.data.elevationScale))
+            material.instance.set_uniform('elevationScale', int(material.instance.data.elevationScale))
 
         if material.instance.has_uniform('mapSize'):
             material.instance.set_uniform('mapSize', int(material.instance.data.mapSize - 1))
 
+        if material.instance.has_uniform('tiling'):
+            material.instance.set_uniform('tiling', material.instance.data.tiling)
+
+        if material.instance.has_uniform('cameraCoords'):
+            material.instance.set_uniform('cameraCoords', material.instance.data.cameraCoords)
+
+        if material.instance.has_uniform('a'):
+            material.instance.set_uniform('a', material.instance.data.a)
+        if material.instance.has_uniform('b'):
+            material.instance.set_uniform('b', material.instance.data.b)
+        if material.instance.has_uniform('fallOffHeight'):
+            material.instance.set_uniform('fallOffHeight', material.instance.data.fallOffHeight)
+        if material.instance.has_uniform('fallOffEnabled'):
+            material.instance.set_uniform('fallOffEnabled', int(material.instance.data.fallOffEnabled))
+        if material.instance.has_uniform('useTextures'):
+            material.instance.set_uniform('useTextures', int(material.instance.data.useTextures))
+        if material.instance.has_uniform('fallOffType'):
+            material.instance.set_uniform('fallOffType', material.instance.data.fallOffType)
+        if material.instance.has_uniform('underWaterRavines'):
+            material.instance.set_uniform('underWaterRavines', int(material.instance.data.underWaterRavines))
+        if material.instance.has_uniform('seed'):
+            material.instance.set_uniform('seed', material.instance.data.seed)
+        if material.instance.has_uniform('octaves'):
+            material.instance.set_uniform('octaves', int(material.instance.data.octaves))
+        if material.instance.has_uniform('frequency'):
+            material.instance.set_uniform('frequency', material.instance.data.frequency)
+        if material.instance.has_uniform('persistence'):
+            material.instance.set_uniform('persistence', material.instance.data.persistence)
+        if material.instance.has_uniform('lacunarity'):
+            material.instance.set_uniform('lacunarity', material.instance.data.lacunarity)
+        if material.instance.has_uniform('turbulance'):
+            material.instance.set_uniform('turbulance', int(material.instance.data.Turbulance))
+        if material.instance.has_uniform('Ridges'):
+            material.instance.set_uniform('Ridges', int(material.instance.data.Ridges))
+        if material.instance.has_uniform('ridgesStrength'):
+            material.instance.set_uniform('ridgesStrength', material.instance.data.RidgesStrength)
         if material.instance.has_uniform('metallic'):
             material.instance.set_uniform('metallic', material.instance.data.metallic)
 

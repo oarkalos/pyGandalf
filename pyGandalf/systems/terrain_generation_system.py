@@ -2,6 +2,7 @@ from pyGandalf.systems.system import System
 from pyGandalf.scene.entity import Entity
 from pyGandalf.scene.components import TerrainComponent
 from pyGandalf.scene.components import StaticMeshComponent
+from pyGandalf.scene.components import TransformComponent
 from pyGandalf.scene.components import Component
 import pyGandalf.utilities.noise_lib as Noise
 import numpy as np
@@ -41,20 +42,26 @@ class TerrainGenerationSystem(System):
         #       See line 145: 'scene.register_system(TerrainGenerationSystem([TerrainComponent, StaticMeshComponent]))'
         terrain: TerrainComponent = components[0]
         mesh: StaticMeshComponent = components[1]
+        transform: TransformComponent = components[2]
 
         vertices = []
         tex_coords = []
 
+        if terrain.cameraMoved:
+            transform.translation.x = terrain.cameraCoords.x
+            transform.translation.z = terrain.cameraCoords.y
+            terrain.cameraMoved = False
+
         if terrain.generate:
-            self.CreateHeightMap(terrain)
-            self.export_texture(terrain.heights, "height_map.png", (terrain.mapSize, terrain.mapSize), terrain)
+            #self.CreateHeightMap(terrain)
+            #self.export_texture(terrain.heights, "height_map.png", (terrain.mapSize, terrain.mapSize), terrain)
             #self.Generate(terrain)
             width, height = (terrain.scale, terrain.scale)
 
             for i in range(terrain.patch_resolution):
                 for j in range(terrain.patch_resolution):
                     vertex = []
-                    vertex.append(-width / 2.0 + width * i / float(terrain.patch_resolution))  # v.x
+                    vertex.append((-width / 2.0 + width * i / float(terrain.patch_resolution)))  # v.x
                     vertex.append(0.0)  # v.y
                     vertex.append(-height / 2.0 + height * j / float(terrain.patch_resolution))  # v.z
                     vertices.append(vertex)
@@ -65,9 +72,9 @@ class TerrainGenerationSystem(System):
                     tex_coords.append(tex_coord)
 
                     vertex = []
-                    vertex.append(-width / 2.0 + width * (i + 1) / float(terrain.patch_resolution))  # v.x
+                    vertex.append((-width / 2.0 + width * (i + 1) / float(terrain.patch_resolution)) )  # v.x
                     vertex.append(0.0)  # v.y
-                    vertex.append(-height / 2.0 + height * j / float(terrain.patch_resolution))  # v.z
+                    vertex.append((-height / 2.0 + height * j / float(terrain.patch_resolution))  )  # v.z
                     vertices.append(vertex)
 
                     tex_coord = []
@@ -76,9 +83,9 @@ class TerrainGenerationSystem(System):
                     tex_coords.append(tex_coord)
 
                     vertex = []
-                    vertex.append(-width / 2.0 + width * i / float(terrain.patch_resolution))  # v.x
+                    vertex.append((-width / 2.0 + width * i / float(terrain.patch_resolution))  )  # v.x
                     vertex.append(0.0)  # v.y
-                    vertex.append(-height / 2.0 + height * (j + 1) / float(terrain.patch_resolution))  # v.z
+                    vertex.append((-height / 2.0 + height * (j + 1) / float(terrain.patch_resolution))  )  # v.z
                     vertices.append(vertex)
 
                     tex_coord = []
@@ -87,9 +94,9 @@ class TerrainGenerationSystem(System):
                     tex_coords.append(tex_coord)
 
                     vertex = []
-                    vertex.append(-width / 2.0 + width * (i + 1) / float(terrain.patch_resolution))  # v.x
+                    vertex.append((-width / 2.0 + width * (i + 1) / float(terrain.patch_resolution))  )  # v.x
                     vertex.append(0.0)  # v.y
-                    vertex.append(-height / 2.0 + height * (j + 1) / float(terrain.patch_resolution))  # v.z
+                    vertex.append((-height / 2.0 + height * (j + 1) / float(terrain.patch_resolution))  )  # v.z
                     vertices.append(vertex)
 
                     tex_coord = []
@@ -151,8 +158,6 @@ class TerrainGenerationSystem(System):
             return lerp(height, terrain.fallOffHeight, h)
         else:
             clampedHeight = height
-            #if(not self.underWaterRavines):
-             #   clampedHeight = self.fallOffHeight
             return lerp(height, clampedHeight, h)
 
     def Generate(self, terrain: TerrainComponent):

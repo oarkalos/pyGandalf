@@ -1,14 +1,35 @@
 // tessellation evaluation shader
-#version 410 core
+#version 430 core
 
 layout (quads, fractional_odd_spacing, ccw) in;
 
-uniform sampler2D u_HeightMap;  // the texture corresponding to our height map
-uniform sampler2D normal_map;
 uniform mat4 u_Model;           // the model matrix
 uniform mat4 u_View;            // the view matrix
 uniform mat4 u_Projection;      // the projection matrix
-uniform float elevationScale;
+uniform vec2 cameraCoords;
+uniform int scale;
+uniform int elevationScale;
+
+uniform int mapSize;
+uniform ivec2 tiling;
+
+//Noise settings
+uniform float frequency = 1.0;
+uniform float lacunarity = 2.0;
+uniform float persistence = 0.5;
+uniform int octaves = 12;
+uniform int turbulance = 1;
+uniform int Ridges = 1;
+uniform int ridgesStrength = 2;
+uniform int seed = 0;
+
+//Fall off settings
+uniform int fallOffEnabled = 0;
+uniform int fallOffType = 0;
+uniform float fallOffHeight = 0.2;
+uniform float a = 2.2;
+uniform float b = 0.4;
+uniform int underWaterRavines = 0;
 
 // received from Tessellation Control Shader - all texture coordinates for the patch vertices
 in vec2 v_TextureCoord[];
@@ -17,6 +38,137 @@ in vec2 v_TextureCoord[];
 out vec3 v_Position;
 out vec3 v_Normal;
 out vec2 v_TexCoord;
+
+float invLerp(float a, float b, float v){
+    return ((v - a) / (b - a));
+}
+
+// Simplex 2D noise
+//
+vec3 permute(vec3 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
+vec4 permute(vec4 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
+
+float snoise(vec2 v){
+  const vec4 C = vec4(0.211324865405187, 0.366025403784439,
+           -0.577350269189626, 0.024390243902439);
+  vec2 i  = floor(v + dot(v, C.yy) );
+  vec2 x0 = v -   i + dot(i, C.xx);
+  vec2 i1;
+  i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+  vec4 x12 = x0.xyxy + C.xxzz;
+  x12.xy -= i1;
+  i = mod(i, 289.0);
+  vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 ))
+  + i.x + vec3(0.0, i1.x, 1.0 ));
+  vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy),
+    dot(x12.zw,x12.zw)), 0.0);
+  m = m*m ;
+  m = m*m ;
+  vec3 x = 2.0 * fract(p * C.www) - 1.0;
+  vec3 h = abs(x) - 0.5;
+  vec3 ox = floor(x + 0.5);
+  vec3 a0 = x - ox;
+  m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+  vec3 g;
+  g.x  = a0.x  * x0.x  + h.x  * x0.y;
+  g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+  return 130.0 * dot(m, g);
+}
+
+//	Classic Perlin 2D Noise 
+//	by Stefan Gustavson (https://github.com/stegu/webgl-noise)
+//
+vec2 fade(vec2 t) {return t*t*t*(t*(t*6.0-15.0)+10.0);}
+
+float cnoise(vec2 P){
+  vec4 Pi = floor(P.xyxy) + vec4(0.0, 0.0, 1.0, 1.0);
+  vec4 Pf = fract(P.xyxy) - vec4(0.0, 0.0, 1.0, 1.0);
+  Pi = mod(Pi, 289.0); // To avoid truncation effects in permutation
+  vec4 ix = Pi.xzxz;
+  vec4 iy = Pi.yyww;
+  vec4 fx = Pf.xzxz;
+  vec4 fy = Pf.yyww;
+  vec4 i = permute(permute(ix) + iy);
+  vec4 gx = 2.0 * fract(i * 0.0243902439) - 1.0; // 1/41 = 0.024...
+  vec4 gy = abs(gx) - 0.5;
+  vec4 tx = floor(gx + 0.5);
+  gx = gx - tx;
+  vec2 g00 = vec2(gx.x,gy.x);
+  vec2 g10 = vec2(gx.y,gy.y);
+  vec2 g01 = vec2(gx.z,gy.z);
+  vec2 g11 = vec2(gx.w,gy.w);
+  vec4 norm = 1.79284291400159 - 0.85373472095314 * vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11));
+  g00 *= norm.x;
+  g01 *= norm.y;
+  g10 *= norm.z;
+  g11 *= norm.w;
+  float n00 = dot(g00, vec2(fx.x, fy.x));
+  float n10 = dot(g10, vec2(fx.y, fy.y));
+  float n01 = dot(g01, vec2(fx.z, fy.z));
+  float n11 = dot(g11, vec2(fx.w, fy.w));
+  vec2 fade_xy = fade(Pf.xy);
+  vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
+  float n_xy = mix(n_x.x, n_x.y, fade_xy.y);
+  return 2.3 * n_xy;
+}
+
+float ApplyFallOff(float x, float z, float height){
+  float distFromCenter = 0;
+  float h = 0;
+
+  if (fallOffType == 0){
+    distFromCenter = pow(x - 0.5, 2) + pow(z - 0.5, 2);
+    distFromCenter *= 2;
+  }else{
+    distFromCenter = max(abs((x * 2) - 1), abs((z * 2) - 1));
+  }
+
+  h = pow(distFromCenter, a) / (pow(distFromCenter, a) + pow(b - b * distFromCenter, a));
+  if(height > fallOffHeight){
+      return mix(height, fallOffHeight, h);
+  }else{
+      float clampedHeight = height;
+      if(underWaterRavines == 0){
+        clampedHeight = fallOffHeight;
+      }
+      return mix(height, clampedHeight, h);
+  }
+}
+
+float fractalPerlinNoise(float x, float z){
+    float tmpFrequency = frequency;
+    float tmpAmplitude = 1.0;
+    float height = 0.0;
+
+    for(int i = 0; i < octaves; i++){
+        float xCoord = (x * tmpFrequency / 64) + seed * 0.83;
+        float zCoord = (z * tmpFrequency / 64) + seed * 23.097;
+        float distFormCenter = snoise(vec2(xCoord, zCoord));
+
+        if(turbulance == 1){
+          distFormCenter = abs(distFormCenter);
+        }
+
+        if (Ridges == 1)
+        {
+          distFormCenter = 1 - distFormCenter;
+          distFormCenter = pow(distFormCenter, ridgesStrength);
+        }
+
+        height += distFormCenter * tmpAmplitude;
+        tmpFrequency *= lacunarity;
+        tmpAmplitude *= persistence;
+    }
+    if(fallOffEnabled == 1){
+      float xCoord = ((x / (scale / 2)) + 1) / 2;
+      float zCoord = ((z / (scale / 2)) + 1) / 2;
+      height = ApplyFallOff(xCoord, zCoord, height);
+    }
+    height *= 1.2;
+    //height = clamp(height, -1.2, 1.2);
+    height = (height + 1.0) * 0.5;
+    return height;
+}
 
 void main()
 {
@@ -35,10 +187,9 @@ void main()
     vec2 t0 = (t01 - t00) * u + t00;
     vec2 t1 = (t11 - t10) * u + t10;
     vec2 texCoord = (t1 - t0) * v + t0;
-    v_TexCoord = texCoord;
-
-    // lookup texel at patch coordinate for height and scale + shift as desired
-    float v_Height = texture(u_HeightMap, texCoord).y * elevationScale - 16.0;
+    texCoord.x = texCoord.x + invLerp(0.0, scale, cameraCoords.x);
+    texCoord.y = texCoord.y + invLerp(0.0, scale, cameraCoords.y);
+    v_TexCoord = texCoord * tiling;
 
     // ----------------------------------------------------------------------
     // retrieve control point position coordinates
@@ -57,10 +208,19 @@ void main()
     vec4 p1 = (p11 - p10) * u + p10;
     vec4 p = (p1 - p0) * v + p0;
 
+    float height = fractalPerlinNoise(p.x + cameraCoords.x, p.z + cameraCoords.y);
+    float heightR = fractalPerlinNoise(p.x + cameraCoords.x + 1, p.z + cameraCoords.y);
+    float heightB = fractalPerlinNoise(p.x + cameraCoords.x, p.z + cameraCoords.y + 1);
+    float heightT = fractalPerlinNoise(p.x + cameraCoords.x, p.z + cameraCoords.y - 1);
+    float heightL = fractalPerlinNoise(p.x + cameraCoords.x - 1, p.z + cameraCoords.y);
+
+    vec3 vecX = vec3(2, (heightR - heightL) * elevationScale, 0);
+    vec3 vecY = vec3(0, (heightT - heightB) * elevationScale, -2);
+    v_Normal = normalize(cross(vecX, vecY));
+
     // displace point along normal
-    p += normal * v_Height;
+    p += normal * height * elevationScale;
     v_Position = p.xyz;
-    v_Normal = texture(normal_map, texCoord).xyz;
 
     // ----------------------------------------------------------------------
     // output patch point position in clip space

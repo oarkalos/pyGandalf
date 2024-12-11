@@ -40,7 +40,7 @@ class MaterialInstance:
         else:
             self.uniform_not_found(uniform_name)
 
-    def update_uniform(self, uniform_location: int, uniform_name: str, uniform_data):
+    def update_uniform(self, uniform_location: int, uniform_name: str, uniform_data, type = None):
         """Updates the uniform at specfied location and the given name with the given data.
 
         Args:
@@ -48,7 +48,10 @@ class MaterialInstance:
             uniform_name (str): The uniform name.
             uniform_data (Any): The new uniform data.
         """
-        uniform_type = self.shader_params[uniform_name]
+        if type is not None:
+            uniform_type = type
+        else:
+            uniform_type = self.shader_params[uniform_name]
         match uniform_type:
             case 'float':
                 assert isinstance(uniform_data, float), f"Uniform type with name: {uniform_name} is not a floating point number"
@@ -219,10 +222,12 @@ class MaterialData:
         self.color = color
         self.textures = textures
         self.glossiness = glossiness
+        self.scale = 200
         self.elevationScale = 10.0
         self.mapSize = 2
+        self.cameraCoords = glm.vec2(0.0, 0.0)
         self.metallic = 0.0
-        self.roughness = 0.4
+        self.roughness = 0.6
         self.ao = 1.0
         self.heightOfBlend = 0.6
         self.depthOfBlend = 1.05
@@ -235,7 +240,25 @@ class MaterialData:
         self.snowColor = glm.vec4(0.93, 0.83, 0.83, 1.0)
         self.grassColor = glm.vec4(0.26, 0.44, 0.2, 1.0)
         self.sandColor = glm.vec4(1.0, 0.7, 0.54, 1.0)
+        self.tiling = glm.ivec2(1, 1)
+        self.fallOffEnabled : bool = False
+        self.underWaterRavines: bool = False
+        self.fallOffType : int = 0
+        self.seed: int = 0
 
+        self.a : float = 3.0
+        self.b : float = 0.5
+        self.fallOffHeight : float = 0.2
+
+        self.octaves = 12
+        self.frequency = 2.0
+        self.persistence = 0.5
+        self.lacunarity = 2.0
+        self.Ridges = False
+        self.RidgesStrength = 2
+        self.Turbulance = False
+        self.useTextures = False
+        self.typeOfNoise = 0
 
     def __eq__(self, other):
         if self.base_template != other.base_template:

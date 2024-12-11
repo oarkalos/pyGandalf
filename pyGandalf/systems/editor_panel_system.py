@@ -277,7 +277,7 @@ class EditorPanelSystem(System):
                 if modified:
                     info.tag = text                            
                 imgui.separator()
-            print(ComponentLib().Transform.__name__)
+            #print(ComponentLib().Transform.__name__)
             if SceneManager().get_active_scene().has_component(EditorVisibleComponent.SELECTED_ENTITY, ComponentLib().Transform):
                 if imgui.tree_node_ex('Transform', flags):
                     transform: ComponentLib().Transform = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, ComponentLib().Transform)
@@ -353,44 +353,84 @@ class EditorPanelSystem(System):
             if SceneManager().get_active_scene().has_component(EditorVisibleComponent.SELECTED_ENTITY, TerrainComponent):
                 if imgui.tree_node_ex('TerrainComponent', flags):
                     terrain: TerrainComponent = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, TerrainComponent)
+                    cameraTransform: TransformComponent = SceneManager().get_active_scene().get_component(terrain.camera, TransformComponent)
                     material: MaterialComponent = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, MaterialComponent)
+                    if terrain.cameraCoords != cameraTransform.translation.xz:
+                        terrain.cameraCoords = cameraTransform.translation.xz
+                        terrain.cameraMoved = True
                     scaleChanged, newScale = imgui.input_int('Scale', terrain.scale, 1)
                     elevationScaleChanged, newElevationScale = imgui.input_int('Elevation Scale', terrain.elevationScale, 1)
                     fallOffChanged, newFallOff = imgui.checkbox('Enable fall off', terrain.fallOffEnabled)
                     typeChanged, newType = imgui.combo('Fall off type', int(terrain.fallOffType), ['Circle', 'Rectangle'])
                     aChanged, newA = imgui.drag_float('a', terrain.a, 0.01)
                     bChanged, newB = imgui.drag_float('b', terrain.b, 0.01)
+                    fallOffHeightChanged, newFallOffHeight = imgui.drag_float('Fall off height', terrain.fallOffHeight, 0.1, 0.0)
+                    underWaterRavinesChanged, newUnderWaterRavines = imgui.checkbox('Under water ravines', terrain.underWaterRavines)
                     terrainChanged, newMapSize = imgui.drag_int('Map size', terrain.mapSize, 8, 8, 512)
-                    gpuChanged, newGPU = imgui.checkbox('GPU accelerated noise', terrain.gpu)
-                    for layer in terrain.noiseLayers:
-                        if imgui.tree_node_ex(layer.name, flags):
-                            seedChanged, newSeed = imgui.input_int('Seed', layer.seed, 1)
-                            octavesChanged, newOctaves = imgui.input_int('Ocatves', layer.octaves, 1)
-                            frequencyChanged, newFrequency = imgui.drag_float('Frequency', layer.frequency, 0.01)
-                            persistenceChanged, newPersistence = imgui.drag_float('Persistence', layer.persistence, 0.01)
-                            lacunarityChanged, newLacunarity = imgui.drag_float('Lacunarity', layer.lacunarity, 0.01)
-                            if seedChanged: layer.seed = newSeed
-                            if octavesChanged: layer.octaves = newOctaves
-                            if frequencyChanged: layer.frequency = newFrequency
-                            if persistenceChanged: layer.persistence = newPersistence
-                            if lacunarityChanged: layer.lacunarity = newLacunarity
-                            imgui.tree_pop()
-                        imgui.separator()
+                    seedChanged, newSeed = imgui.input_int('Seed', terrain.noiseSettings.seed, 1)
+                    octavesChanged, newOctaves = imgui.input_int('Ocatves', terrain.noiseSettings.octaves, 1)
+                    frequencyChanged, newFrequency = imgui.drag_float('Frequency', terrain.noiseSettings.frequency, 0.01)
+                    persistenceChanged, newPersistence = imgui.drag_float('Persistence', terrain.noiseSettings.persistence, 0.01)
+                    lacunarityChanged, newLacunarity = imgui.drag_float('Lacunarity', terrain.noiseSettings.lacunarity, 0.01)
+                    turbulanceChanged, newTurbulance = imgui.checkbox('Turbulance', terrain.noiseSettings.Turbulance)
+                    ridgesChanged, newRidges = imgui.checkbox('Ridges', terrain.noiseSettings.Ridges)
+                    ridgesStrengthChanged, newRidgesStrength = imgui.drag_int('Ridges Strength', terrain.noiseSettings.RidgesStrength, 1, 0, 5)
+                    if seedChanged: terrain.noiseSettings.seed = newSeed
+                    if octavesChanged: terrain.noiseSettings.octaves = newOctaves
+                    if frequencyChanged: terrain.noiseSettings.frequency = newFrequency
+                    if persistenceChanged: terrain.noiseSettings.persistence = newPersistence
+                    if lacunarityChanged: terrain.noiseSettings.lacunarity = newLacunarity
+                    if turbulanceChanged: terrain.noiseSettings.Turbulance = newTurbulance
+                    if ridgesChanged: terrain.noiseSettings.Ridges = newRidges
+                    if ridgesStrengthChanged: terrain.noiseSettings.RidgesStrength = newRidgesStrength
                     imgui.button('Generate Terrain', imgui.ImVec2(60, 10))
                     if imgui.is_item_clicked():
                         terrain.generate = True
-                        if material.instance.has_uniform('elevationScale'):
-                            material.instance.data.elevationScale = terrain.elevationScale
-                        if material.instance.has_uniform('mapSize'):
-                            material.instance.data.mapSize = terrain.mapSize / 8
                     if scaleChanged: terrain.scale = newScale
                     if elevationScaleChanged: terrain.elevationScale = newElevationScale
                     if fallOffChanged: terrain.fallOffEnabled = newFallOff
                     if typeChanged: terrain.fallOffType = newType
                     if aChanged: terrain.a = newA
                     if bChanged: terrain.b = newB
+                    if fallOffHeightChanged: terrain.fallOffHeight = newFallOffHeight
+                    if underWaterRavinesChanged: terrain.underWaterRavines = newUnderWaterRavines
                     if terrainChanged: terrain.mapSize = newMapSize
-                    if gpuChanged: terrain.gpu = newGPU
+                    if material.instance.has_uniform('scale'):
+                        material.instance.data.scale = terrain.scale
+                    if material.instance.has_uniform('elevationScale'):
+                        material.instance.data.elevationScale = terrain.elevationScale
+                    if material.instance.has_uniform('mapSize'):
+                        material.instance.data.mapSize = terrain.mapSize / 8
+                    if material.instance.has_uniform('cameraCoords'):
+                        material.instance.data.cameraCoords = terrain.cameraCoords
+                    if material.instance.has_uniform('a'):
+                        material.instance.data.a = terrain.a
+                    if material.instance.has_uniform('b'):
+                        material.instance.data.b = terrain.b
+                    if material.instance.has_uniform('fallOffHeight'):
+                        material.instance.data.fallOffHeight = terrain.fallOffHeight
+                    if material.instance.has_uniform('fallOffEnabled'):
+                        material.instance.data.fallOffEnabled = terrain.fallOffEnabled
+                    if material.instance.has_uniform('fallOffType'):
+                        material.instance.data.fallOffType = terrain.fallOffType
+                    if material.instance.has_uniform('underWaterRavines'):
+                        material.instance.data.underWaterRavines = terrain.underWaterRavines
+                    if material.instance.has_uniform('seed'):
+                        material.instance.data.seed = terrain.noiseSettings.seed
+                    if material.instance.has_uniform('octaves'):
+                        material.instance.data.octaves = terrain.noiseSettings.octaves
+                    if material.instance.has_uniform('frequency'):
+                        material.instance.data.frequency = terrain.noiseSettings.frequency
+                    if material.instance.has_uniform('persistence'):
+                        material.instance.data.persistence = terrain.noiseSettings.persistence
+                    if material.instance.has_uniform('lacunarity'):
+                        material.instance.data.lacunarity = terrain.noiseSettings.lacunarity
+                    if material.instance.has_uniform('turbulance'):
+                        material.instance.data.Turbulance = terrain.noiseSettings.Turbulance
+                    if material.instance.has_uniform('Ridges'):
+                        material.instance.data.Ridges = terrain.noiseSettings.Ridges
+                    if material.instance.has_uniform('ridgesStrength'):
+                        material.instance.data.RidgesStrength = terrain.noiseSettings.RidgesStrength
                     imgui.tree_pop()
                 imgui.separator()
 
@@ -478,6 +518,14 @@ class EditorPanelSystem(System):
                     if material.instance.has_uniform('ao'):
                         ao_changed, new_ao = imgui.drag_float('ao', material.instance.data.ao, 0.01, 0.0, 1.0)
                         if ao_changed: material.instance.data.ao = new_ao
+
+                    if material.instance.has_uniform('tiling'):
+                        tiling_changed, new_tiling = imgui.drag_int2('tiling', material.instance.data.tiling, 1, 1, 100)
+                        if tiling_changed: material.instance.data.tiling = glm.ivec2(new_tiling[0], new_tiling[1])
+
+                    if material.instance.has_uniform('useTextures'):
+                        useTextures_changed, new_useTextures = imgui.checkbox('useTextures', material.instance.data.useTextures)
+                        if useTextures_changed: material.instance.data.useTextures = new_useTextures
 
                     if material.instance.has_uniform('_Height_of_blend'):
                         height_of_blend_changed, new_height_of_blend = imgui.drag_float('_Height_of_blend', material.instance.data.heightOfBlend, 0.01, 0.0, 10.0)
@@ -779,7 +827,7 @@ class EditorPanelSystem(System):
                 if imgui.is_item_clicked():
                     system.set_state(SystemState.PLAY)
             elif system.state == SystemState.PLAY:
-                imgui.button('Pause', imgui.ImVec2(60, 20))
+                """imgui.button('Pause', imgui.ImVec2(60, 20))
                 if imgui.is_item_clicked():
-                    system.set_state(SystemState.PAUSE)
+                    system.set_state(SystemState.PAUSE)"""
             imgui.separator()

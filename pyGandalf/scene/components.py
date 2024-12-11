@@ -127,22 +127,26 @@ class WebGPUComputeComponent(Component):
         self.dispatch = False
 
 class TerrainComponent(Component):
-    def __init__(self, scale, elevationScale, mapSize, fallOffEnabled, fallOffType, a, b, fallOffHeight, patch_resolution, vertices_per_patch, gpu):
-        self.noiseLayers = []
+    def __init__(self, scale, elevationScale, mapSize, fallOffEnabled, fallOffType, a, b, fallOffHeight, patch_resolution, vertices_per_patch, camera = None):
+        self.noiseSettings = None
         self.minHeight = 0.0
         self.maxHeight = 0.0
         self.scale : float = scale
         self.elevationScale : float = elevationScale
         self.mapSize : int = mapSize
         self.fallOffEnabled : bool = fallOffEnabled
+        self.underWaterRavines: bool = False
         self.fallOffType : int = fallOffType
         self.patch_resolution : int = patch_resolution
         self.vertices_per_patch : int = vertices_per_patch
+        self.cameraCoords: glm.vec2 = glm.vec2(0.0, 0.0)
+        self.camera: Entity = camera
 
         self.a : float = a
         self.b : float = b
         self.fallOffHeight : float = fallOffHeight
         self.generate: bool = False
+        self.cameraMoved: bool = False
 
         self.minTerrainHeight = []
         self.maxTerrainHeight = []
@@ -150,4 +154,16 @@ class TerrainComponent(Component):
         self.heights = []
         self.vertices = []
         self.indices = []
-        self.gpu: bool = gpu
+
+class ComputeComponent(Component):
+    def __init__(self, compute_shader: str, textures: list[int], x: int, y: int, z: int):
+        self.shader: str = compute_shader
+        self.textures: list[int] = textures
+        self.dispatch = False
+
+        self.ID: int = 0
+        self.uniformsDictionary: dict[str, str] = {}
+        self.uniformsData = []
+        self.workGroupsX = x
+        self.workGroupsY = y
+        self.workGroupsZ = z

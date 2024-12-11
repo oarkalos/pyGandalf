@@ -1,9 +1,31 @@
-#version 410 core
+#version 430 core
 
 in vec3 v_Position;
 in vec3 v_Normal;
 in vec2 v_TexCoord;
 
+//albedo textures
+uniform sampler2D grassAlbedo;
+uniform sampler2D snowAlbedo;
+uniform sampler2D sandAlbedo;
+
+//normal textures
+uniform sampler2D grassNormal;
+uniform sampler2D snowNormal;
+uniform sampler2D sandNormal;
+
+//mask textures
+uniform sampler2D grassMask;
+uniform sampler2D snowMask;
+uniform sampler2D sandMask;
+
+//rock textures
+uniform sampler2D rockAlbedo;
+uniform sampler2D rockNormal;
+uniform sampler2D rockMask;
+
+uniform ivec2 tiling;
+uniform int useTextures = 1;
 // Camera properties
 uniform vec3 u_ViewPosition = vec3(0.0, 0.0, 10.0);
 
@@ -31,10 +53,32 @@ uniform float slopeTreshold;
 uniform vec4 snowColor;
 uniform vec4 grassColor;
 uniform vec4 sandColor;
+uniform int mapSize;
 
 out vec4 FragColor;
 
 const float PI = 3.14159265359;
+
+// Easy trick to get tangent-normals to world-space to keep PBR code simplified.
+// Don't worry if you don't get what's going on; you generally want to do normal 
+// mapping the usual way for performance anyways; I do plan make a note of this 
+// technique somewhere later in the normal mapping tutorial.
+vec3 getNormalFromMap(sampler2D u_NormalMap, vec2 uv)
+{
+    vec3 tangentNormal = texture(u_NormalMap, uv).xyz * 2.0 - 1.0;
+
+    vec3 Q1  = dFdx(v_Position);
+    vec3 Q2  = dFdy(v_Position);
+    vec2 st1 = dFdx(uv);
+    vec2 st2 = dFdy(uv);
+
+    vec3 N   = normalize(v_Normal);
+    vec3 T  = normalize(Q1*st2.t - Q2*st1.t);
+    vec3 B  = -normalize(cross(N, T));
+    mat3 TBN = mat3(T, B, N);
+
+    return normalize(TBN * tangentNormal);
+}
 
 float invLerp(float a, float b, float v){
     return ((v - a) / (b - a));
@@ -173,13 +217,86 @@ float SlopeBlending(float Slope, float BlendAmount, float NormalY){
     return 1 - clamp((slope-grassBlendHeight)/(Slope-grassBlendHeight), 0.0, 1.0);
 }
 
+vec2 Bombing(vec2 UVS){
+    vec2 floorUVS = floor(UVS);
+    vec3 p3 = fract(floorUVS.xyx * vec3(0.1031, 0.1030, 0.0973));
+
+    p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.xx + p3.yz) * p3.zy) + UVS;
+}
+
+vec4 UVSBombimg1(){
+    vec2 UVS1 = Bombing(floor(v_TexCoord)) + v_TexCoord;
+    vec2 UVS2 = Bombing(floor(v_TexCoord + vec2(0.5, 10))) + v_TexCoord;
+    return vec4(UVS1.x, UVS1.y, UVS2.x, UVS2.y);
+}
+
+vec4 UVSBombimg2(){
+    vec2 UVS1 = Bombing(floor(v_TexCoord + vec2(-10, 0.5))) + v_TexCoord;
+    vec2 UVS2 = Bombing(floor(v_TexCoord + vec2(20.5, 0.5))) + v_TexCoord;
+    return vec4(UVS1.x, UVS1.y, UVS2.x, UVS2.y);
+}
+
+vec2 UVSBombimgLerValue(){
+    vec2 tmp = (fract(tiling) * vec2(2.0, 2.0)) - vec2(1.0, 1.0);
+    return smoothstep(vec2(0.25, 0.25), vec2(0.75, 0.75), abs(tmp));
+}
+
+vec4 calculateAlbedo(vec3 values, vec2 UVS1, vec2 UVS2, vec2 UVS3, vec2 UVS4, vec2 lerpValues){
+    vec4 grassColor = mix(mix(texture(grassAlbedo, UVS1), texture(grassAlbedo, UVS2), lerpValues.r), mix(texture(grassAlbedo, UVS3), texture(grassAlbedo, UVS4), lerpValues.r), lerpValues.g);
+    vec4 snowColor = mix(mix(texture(snowAlbedo, UVS1), texture(snowAlbedo, UVS2), lerpValues.r), mix(texture(snowAlbedo, UVS3), texture(snowAlbedo, UVS4), lerpValues.r), lerpValues.g);
+    vec4 sandColor = mix(mix(texture(sandAlbedo, UVS1), texture(sandAlbedo, UVS2), lerpValues.r), mix(texture(sandAlbedo, UVS3), texture(sandAlbedo, UVS4), lerpValues.r), lerpValues.g);
+    return HeightSplatting(HeightSplatting(sandColor, grassColor, values.z), HeightSplatting(grassColor, snowColor, values.x), values.y);
+}
+
+vec4 calculateNormal(vec3 values, vec2 UVS1, vec2 UVS2, vec2 UVS3, vec2 UVS4, vec2 lerpValues){
+    vec4 grassNormal = vec4(mix(mix(getNormalFromMap(grassNormal, UVS1), getNormalFromMap(grassNormal, UVS2), lerpValues.r), mix(getNormalFromMap(grassNormal, UVS3), getNormalFromMap(grassNormal, UVS4), lerpValues.r), lerpValues.g), 1.0);
+    vec4 snowNormal = vec4(mix(mix(getNormalFromMap(snowNormal, UVS1), getNormalFromMap(snowNormal, UVS2), lerpValues.r), mix(getNormalFromMap(snowNormal, UVS3), getNormalFromMap(snowNormal, UVS4), lerpValues.r), lerpValues.g), 1.0);
+    vec4 sandNormal = vec4(mix(mix(getNormalFromMap(sandNormal, UVS1), getNormalFromMap(sandNormal, UVS2), lerpValues.r), mix(getNormalFromMap(sandNormal, UVS3), getNormalFromMap(sandNormal, UVS4), lerpValues.r), lerpValues.g), 1.0);
+    return HeightSplatting(HeightSplatting(sandNormal, grassNormal, values.z), HeightSplatting(grassNormal, snowNormal, values.x), values.y);
+}
+
+vec4 calculateMask(vec3 values, vec2 UVS1, vec2 UVS2, vec2 UVS3, vec2 UVS4, vec2 lerpValues){
+    vec4 grassMask = mix(mix(texture(grassMask, UVS1), texture(grassMask, UVS2), lerpValues.r), mix(texture(grassMask, UVS3), texture(grassMask, UVS4), lerpValues.r), lerpValues.g);
+    vec4 snowMask = mix(mix(texture(snowMask, UVS1), texture(snowMask, UVS2), lerpValues.r), mix(texture(snowMask, UVS3), texture(snowMask, UVS4), lerpValues.r), lerpValues.g);
+    vec4 sandMask = mix(mix(texture(sandMask, UVS1), texture(sandMask, UVS2), lerpValues.r), mix(texture(sandMask, UVS3), texture(sandMask, UVS4), lerpValues.r), lerpValues.g);
+    float roughness = mix(mix(sandMask.a, grassMask.a, values.z), mix(grassMask.a, snowMask.a, values.x), values.y);
+    return vec4(HeightSplatting(HeightSplatting(sandMask, grassMask, values.z), HeightSplatting(grassMask, snowMask, values.x), values.y).xyz, roughness);
+}
+
 void main()
 {
-    vec3 N = v_Normal;
     vec3 values = HeightSplattingValues(heightOfSnow, heightOfGrass);
-    vec4 color = HeightSplatting(HeightSplatting(sandColor, grassColor, values.z), HeightSplatting(grassColor, snowColor, values.x), values.y);
-    float rockBlendValue = SlopeBlending(slopeTreshold, rockBlendAmount, N.y);
-    vec4 finalWithRock = HeightSplatting(rockColor, color, rockBlendValue);
+    float rockBlendValue = SlopeBlending(slopeTreshold, rockBlendAmount, v_Normal.y);
 
-    FragColor = PBR(finalWithRock.xyz, N, metallic, roughness, ao);
+    vec3 normal;
+    vec4 mask;
+    vec4 albedo;
+    vec4 rockA = rockColor;
+    vec4 rockN = vec4(0.0);
+    vec4 rockM = vec4(0.0);
+
+    if(useTextures == 0){
+        albedo = HeightSplatting(HeightSplatting(sandColor, grassColor, values.z), HeightSplatting(grassColor, snowColor, values.x), values.y);
+        normal = v_Normal;
+        mask = vec4(metallic, ao, 1.0, roughness);
+    }else{
+        vec4 bombing1 = UVSBombimg1();
+        vec4 bombing2 = UVSBombimg2();
+        vec2 lerpValues = UVSBombimgLerValue();
+
+        albedo = calculateAlbedo(values, vec2(bombing1.xy), vec2(bombing1.zw), vec2(bombing2.xy), vec2(bombing2.zw), lerpValues);
+        normal = calculateNormal(values, vec2(bombing1.xy), vec2(bombing1.zw), vec2(bombing2.xy), vec2(bombing2.zw), lerpValues).xyz;
+        mask = calculateMask(values, vec2(bombing1.xy), vec2(bombing1.zw), vec2(bombing2.xy), vec2(bombing2.zw), lerpValues);
+
+        rockA = texture(rockAlbedo, v_TexCoord);
+        rockN = vec4(getNormalFromMap(rockNormal, v_TexCoord), 1.0);
+        rockM = texture(rockMask, v_TexCoord);
+
+        normal = HeightSplatting(rockN, vec4(normal, 1.0), rockBlendValue).xyz;
+        mask = HeightSplatting(rockM, mask, rockBlendValue);
+    }
+    albedo = HeightSplatting(rockA, albedo, rockBlendValue);
+
+    FragColor = PBR(albedo.xyz, normal, mask.r, mask.a, mask.b);
 }

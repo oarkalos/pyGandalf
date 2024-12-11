@@ -11,6 +11,7 @@ from pyGandalf.systems.camera_system import CameraSystem
 from pyGandalf.systems.camera_controller_system import CameraControllerSystem
 from pyGandalf.systems.opengl_rendering_system import OpenGLStaticMeshRenderingSystem
 from pyGandalf.systems.terrain_generation_system import TerrainGenerationSystem
+from pyGandalf.systems.opengl_compute_pipeline_system import OpenGLComputePipelineSystem
 
 from pyGandalf.renderer.opengl_renderer import OpenGLRenderer
 
@@ -19,10 +20,11 @@ from pyGandalf.scene.scene_manager import SceneManager
 from pyGandalf.scene.components import *
 
 from pyGandalf.utilities.opengl_material_lib import OpenGLMaterialLib, MaterialData, MaterialDescriptor
-from pyGandalf.utilities.opengl_texture_lib import OpenGLTextureLib, TextureData
+from pyGandalf.utilities.opengl_texture_lib import OpenGLTextureLib, TextureData, TextureDescriptor
 from pyGandalf.utilities.opengl_shader_lib import OpenGLShaderLib
 
 from pyGandalf.utilities.definitions import SHADERS_PATH
+from pyGandalf.utilities.definitions import TEXTURES_PATH
 from pyGandalf.utilities.logger import logger
 
 import glfw
@@ -31,18 +33,15 @@ import OpenGL.GL as gl
 import pyGandalf.utilities.noise_lib as Noise
 
 def main():
-    noiseSettings = Noise.NoiseSettings('Mountains', 30, 2, 2, 0.5, 2, False, 2, False, Noise.typeOfNoise.Perlin)
-    #noiseSettings2 = Noise.NoiseSettings('Mountains2', 3, 7, 2, 0.5, 2, False, 2, False, Noise.typeOfNoise.Perlin)
+    noiseSettings = Noise.NoiseSettings('Mountains', 30, 5, 0.8, 0.4, 2.0, False, 2, False, Noise.typeOfNoise.Perlin)
     # Set the logger DEBUG to report all the logs
     logger.setLevel(logger.DEBUG)
 
     patch_resolution = 8
     vertices_per_patch = 4
-    terrainComponent = TerrainComponent(200, 62, 64, True, Noise.typeOfFallOff.Circle, 2.2, 0.4, 0.2, patch_resolution, vertices_per_patch, False)
 
     # Create a new application
     Application().create(OpenGLWindow('Tessellation Shaders', 1280, 720, True), OpenGLRenderer, attach_imgui=True, attach_editor=True)
-    #OpenGLRenderer().set_shadows_enabled(True)
 
     # Create a new scene
     scene = Scene('Tessellation Shaders')
@@ -52,16 +51,28 @@ def main():
     camera = scene.enroll_entity()
     terrain = scene.enroll_entity()
     light = scene.enroll_entity()
-
-    # Build textures
-    OpenGLTextureLib().build('height_map', TextureData('height_map.png'))
-    OpenGLTextureLib().build('normal_map', TextureData('height_map_normals.png'))
+    terrainComponent = TerrainComponent(200, 25, 256, True, Noise.typeOfFallOff.Circle, 2.2, 0.4, 0.2, patch_resolution, vertices_per_patch, camera)
 
     # Build shaders
     OpenGLShaderLib().build('default_tessellation', SHADERS_PATH / 'opengl' / 'tessellation.vs', SHADERS_PATH / 'opengl' / 'tessellation.fs', None, SHADERS_PATH / 'opengl' / 'tessellation.tcs', SHADERS_PATH / 'opengl' / 'tessellation.tes')
-    
+    descriptor = TextureDescriptor(min_filter=gl.GL_LINEAR_MIPMAP_LINEAR)
+    OpenGLTextureLib().build('grassAlbedo', TextureData(TEXTURES_PATH / 'terrain' / 'Grass_A_BaseColor.png'), descriptor)
+    OpenGLTextureLib().build('snowAlbedo', TextureData(TEXTURES_PATH / 'terrain' / 'Snow_BaseColor.png'), descriptor)
+    OpenGLTextureLib().build('sandAlbedo', TextureData(TEXTURES_PATH / 'terrain' / 'Sand_BaseColor.png'), descriptor)
+
+    OpenGLTextureLib().build('grassNormal', TextureData(TEXTURES_PATH / 'terrain' / 'Grass_A_Normal.png'), descriptor)
+    OpenGLTextureLib().build('snowNormal', TextureData(TEXTURES_PATH / 'terrain' / 'Snow_Normal.png'), descriptor)
+    OpenGLTextureLib().build('sandNormal', TextureData(TEXTURES_PATH / 'terrain' / 'Sand_Normal.png'), descriptor)
+
+    OpenGLTextureLib().build('grassMask', TextureData(TEXTURES_PATH / 'terrain' / 'Grass_A_MaskMap.png'), descriptor)
+    OpenGLTextureLib().build('snowMask', TextureData(TEXTURES_PATH / 'terrain' / 'Snow_MaskMap.png'), descriptor)
+    OpenGLTextureLib().build('sandMask', TextureData(TEXTURES_PATH / 'terrain' / 'Sand_MaskMap.png'), descriptor)
+
+    OpenGLTextureLib().build('rockAlbedo', TextureData(TEXTURES_PATH / 'terrain' / 'Rock_BaseColor.png'), descriptor)
+    OpenGLTextureLib().build('rockNormal', TextureData(TEXTURES_PATH / 'terrain' / 'Rock_Normal.png'), descriptor)
+    OpenGLTextureLib().build('rockMask', TextureData(TEXTURES_PATH / 'terrain' / 'Rock_MaskMap.png'), descriptor)
     # Build Materials
-    OpenGLMaterialLib().build('M_Terrain', MaterialData('default_tessellation', ['height_map', 'normal_map']), MaterialDescriptor(primitive=gl.GL_PATCHES, cull_face=gl.GL_FRONT, patch_resolution=terrainComponent.patch_resolution, vertices_per_patch=terrainComponent.vertices_per_patch))
+    OpenGLMaterialLib().build('M_Terrain', MaterialData('default_tessellation', ['grassAlbedo', 'snowAlbedo', 'sandAlbedo', 'grassNormal', 'snowNormal', 'sandNormal', 'grassMask', 'snowMask', 'sandMask', 'rockAlbedo', 'rockNormal', 'rockMask']), MaterialDescriptor(primitive=gl.GL_PATCHES, cull_face=gl.GL_FRONT, patch_resolution=terrainComponent.patch_resolution, vertices_per_patch=terrainComponent.vertices_per_patch))
 
     vertices = [[0.0, 0.0, 0.0]]
     tex_coords = [[0.0, 0.0]]
@@ -74,7 +85,7 @@ def main():
     scene.add_component(root, InfoComponent('root'))
     scene.add_component(root, LinkComponent(None))
 
-    terrainComponent.noiseLayers.append(noiseSettings)
+    terrainComponent.noiseSettings = noiseSettings
     #terrainComponent.noiseLayers.append(noiseSettings2)
 
     # Register components to terrain
@@ -96,16 +107,16 @@ def main():
     scene.add_component(light, InfoComponent("light"))
     scene.add_component(light, TransformComponent(glm.vec3(0, 50, 2), glm.vec3(0, 0, 0), glm.vec3(1, 1, 1)))
     scene.add_component(light, LinkComponent(root))
-    scene.add_component(light, LightComponent(glm.vec3(1.0, 1.0, 1.0), 10000.0))
+    scene.add_component(light, LightComponent(glm.vec3(1.0, 1.0, 1.0), 15000.0))
 
     # Create Register systems
     scene.register_system(TransformSystem([TransformComponent]))
     scene.register_system(LinkSystem([LinkComponent, TransformComponent]))
     scene.register_system(CameraSystem([CameraComponent, TransformComponent]))
     scene.register_system(LightSystem([LightComponent, TransformComponent]))
+    scene.register_system(TerrainGenerationSystem([TerrainComponent, StaticMeshComponent, TransformComponent]))
     scene.register_system(OpenGLStaticMeshRenderingSystem([StaticMeshComponent, MaterialComponent, TransformComponent]))
     scene.register_system(CameraControllerSystem([CameraControllerComponent, CameraComponent, TransformComponent]))
-    scene.register_system(TerrainGenerationSystem([TerrainComponent, StaticMeshComponent]))
 
     # Add scene to manager
     SceneManager().add_scene(scene)
