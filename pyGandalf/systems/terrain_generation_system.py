@@ -3,31 +3,12 @@ from pyGandalf.scene.entity import Entity
 from pyGandalf.scene.components import TerrainComponent
 from pyGandalf.scene.components import StaticMeshComponent
 from pyGandalf.scene.components import TransformComponent
+from pyGandalf.scene.components import ComputeComponent
 from pyGandalf.scene.components import Component
-import pyGandalf.utilities.noise_lib as Noise
 import numpy as np
 import glm
 from PIL import Image, ImageDraw
 from pyGandalf.utilities.opengl_texture_lib import OpenGLTextureLib, TextureData
-
-def lerp(a: float, b: float, t: float) -> float:
-    """Linear interpolate on the scale given by a to b, using t as the point on that scale.
-    Examples
-    --------
-        50 == lerp(0, 100, 0.5)
-        4.2 == lerp(1, 5, 0.8)
-    """
-    return (1 - t) * a + t * b
-
-# From: https://gist.github.com/laundmo/b224b1f4c8ef6ca5fe47e132c8deab56
-def inv_lerp(a: float, b: float, v: float) -> float:
-    """Inverse Linar Interpolation, get the fraction between a and b on which v resides.
-    Examples
-    --------
-        0.5 == inv_lerp(0, 100, 50)
-        0.8 == inv_lerp(1, 5, 4.2)
-    """
-    return (v - a) / (b - a)
 
 class TerrainGenerationSystem(System):
     """
@@ -43,6 +24,12 @@ class TerrainGenerationSystem(System):
         terrain: TerrainComponent = components[0]
         mesh: StaticMeshComponent = components[1]
         transform: TransformComponent = components[2]
+        compute: ComputeComponent = components[3]
+
+        """if terrain.mapSize != compute.workGroupsX:
+            compute.workGroupsX = terrain.mapSize
+            compute.workGroupsY = terrain.mapSize
+            OpenGLTextureLib().update('heightmap', TextureData(width=terrain.mapSize, height=terrain.mapSize))"""
 
         vertices = []
         tex_coords = []
@@ -111,10 +98,6 @@ class TerrainGenerationSystem(System):
             mesh.changed = True 
             terrain.generate = False
 
-            # Build textures
-            OpenGLTextureLib().update('height_map', TextureData('height_map.png'))
-            OpenGLTextureLib().update('normal_map', TextureData('height_map_normals.png'))
-
     def export_texture(self, heightmap, filename, map_size=(256, 256), terrain=None):
         image = Image.new('RGB', map_size, 0)
         normalImage = Image.new('RGB', map_size, 0)
@@ -144,87 +127,3 @@ class TerrainGenerationSystem(System):
         normalImage.save("height_map_normals.png")
         print(filename, "saved")
         return image.width, image.height
-
-    def ApplyFallOff(self, x, z, height, terrain: TerrainComponent):
-        distFromCenter = 0
-        h = 0
-        if(terrain.fallOffType == Noise.typeOfFallOff.Circle):
-            distFromCenter = np.power(x - 0.5, 2) + np.power(z - 0.5, 2)
-            distFromCenter *= 2
-        else:
-            distFromCenter = max(np.abs(x*2 - 1.0), np.abs(z*2 - 1.0))
-        h = np.power(distFromCenter, terrain.a) / (np.power(distFromCenter, terrain.a) + np.power(terrain.b - terrain.b * distFromCenter, terrain.a))
-        if(height > terrain.fallOffHeight):
-            return lerp(height, terrain.fallOffHeight, h)
-        else:
-            clampedHeight = height
-            return lerp(height, clampedHeight, h)
-
-    def Generate(self, terrain: TerrainComponent):
-        v = 0
-        t = 0
-        i = 0
-
-        for z in range(0, terrain.mapSize, 1):
-            zCoord = (z / (terrain.mapSize - 1.0)) * 2
-            for x in range(0, terrain.mapSize, 1):
-                xCoord = (x / (terrain.mapSize - 1.0)) * 2
-                terrain.vertices[i] =[(xCoord - 1) * terrain.scale, terrain.heights[z][x] * terrain.elevationScale, (zCoord - 1) * terrain.scale]
-
-                i = i + 1
-
-                if ((z < terrain.mapSize - 1) and (x < terrain.mapSize - 1)):
-                    terrain.indices[t] = v
-                    terrain.indices[t + 1] = v + terrain.mapSize
-                    terrain.indices[t + 2] = v + 1
-                    terrain.indices[t + 3] = v + 1
-                    terrain.indices[t + 4] = v + terrain.mapSize
-                    terrain.indices[t + 5] = v + terrain.mapSize + 1
-                    v = v + 1
-                    t += 6
-                if (x == terrain.mapSize - 1):
-                    v = v + 1
-
-    def CreateHeightMap(self, terrain: TerrainComponent):
-        terrain.heightMap = [[[0.0 for x in range(0, terrain.mapSize, 1)] for z in range(0, terrain.mapSize, 1)] for i in range(0, len(terrain.noiseLayers), 1)]
-        terrain.heights = [[0.0 for x in range(0, terrain.mapSize, 1)] for z in range(0, terrain.mapSize, 1)]
-        terrain.vertices = [[0.0, 0.0, 0.0] for x in range(0, terrain.mapSize * terrain.mapSize, 1)]
-        terrain.indices = [0 for x in range(0, (terrain.mapSize - 1) * (terrain.mapSize - 1) * 6, 1)]
-        for i in range(0, len(terrain.noiseLayers), 1):
-            terrain.minTerrainHeight.append(100)
-            terrain.maxTerrainHeight.append(0)
-        terrain.minHeight = 100
-        terrain.maxHeight = 0
-
-        for i in range(0, len(terrain.noiseLayers), 1):
-            for z in range(0, terrain.mapSize, 1):
-                for x in range(0, terrain.mapSize, 1):
-                    terrain.heightMap[i][z][x] = Noise.Noise(x, z, terrain.noiseLayers[i], terrain.mapSize)
-                    terrain.minTerrainHeight[i] = min(terrain.minTerrainHeight[i], terrain.heightMap[i][z][x])
-                    terrain.maxTerrainHeight[i] = max(terrain.maxTerrainHeight[i], terrain.heightMap[i][z][x])
-
-        for z in range(0, terrain.mapSize, 1):
-            zCoord = z / (terrain.mapSize - 1.0)
-            for x in range(0, terrain.mapSize, 1):   
-                xCoord = x / (terrain.mapSize - 1.0)
-                height = 0
-                mask = 1
-                for l in range(0, len(terrain.noiseLayers), 1):
-                    if terrain.noiseLayers[l].layerActive:
-                        terrain.heightMap[l][z][x] = inv_lerp(terrain.minTerrainHeight[l], terrain.maxTerrainHeight[l], terrain.heightMap[l][z][x])
-                        if l != 0:
-                            if (terrain.noiseLayers[l].useFirstLayerAsMask):
-                                mask = terrain.heightMap[0][z][x]
-                            else:
-                                mask = 1
-                        height += terrain.heightMap[l][z][x] * mask
-
-                if terrain.fallOffEnabled:
-                    height = self.ApplyFallOff(xCoord, zCoord, height, terrain)
-                terrain.minHeight = min(terrain.minHeight, height)
-                terrain.maxHeight = max(terrain.maxHeight, height)
-                terrain.heights[z][x] = height
-            
-        for z in range(0, terrain.mapSize, 1):
-            for x in range(0, terrain.mapSize, 1):
-                terrain.heights[z][x] = inv_lerp(terrain.minHeight, terrain.maxHeight, terrain.heights[z][x])

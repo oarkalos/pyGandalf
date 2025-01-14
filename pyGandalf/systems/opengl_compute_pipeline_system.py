@@ -2,12 +2,11 @@ import OpenGL.GL as gl
 from pyGandalf.systems.system import System
 from pyGandalf.scene.entity import Entity
 from pyGandalf.scene.components import Component
-from pyGandalf.scene.components import ComputeComponent
+from pyGandalf.scene.components import ComputeComponent, GUIData
 from pyGandalf.utilities.opengl_shader_lib import OpenGLShaderLib
 from pyGandalf.utilities.opengl_material_lib import MaterialInstance
 from pyGandalf.utilities.definitions import SHADERS_PATH
-from pathlib import Path
-import os
+import glm
 
 class OpenGLComputePipelineSystem(System):
 
@@ -25,10 +24,64 @@ class OpenGLComputePipelineSystem(System):
             raise RuntimeError(gl.glGetProgramInfoLog(shader_program).decode('utf-8'))
 
         gl.glDeleteShader(compute_shader)
-        print("Created")
 
-        gl.glBindImageTexture(2, compute.textures[0], 0, gl.GL_FALSE, 0, gl.GL_READ_WRITE, gl.GL_R32F)
+        gl.glBindImageTexture(0, compute.textures[0], 0, gl.GL_FALSE, 0, gl.GL_READ_WRITE, gl.GL_RGBA32F)
         compute.ID = shader_program
+
+        compute_params = OpenGLShaderLib().parse(computeCode)
+        compute.uniformsDictionary = compute_params
+
+        if compute.uniformsData == []:
+            for uniformName, uniformType in compute.uniformsDictionary.items():
+                match uniformType:
+                    case 'float':
+                        compute.uniformsData.append(0.0)
+                    case 'int':
+                        compute.uniformsData.append(0)
+                    case 'image2D':
+                        compute.uniformsData.append(0)
+                    case 'sampler2D':
+                        compute.uniformsData.append(0)
+                    case 'samplerCube':
+                        compute.uniformsData.append(0)
+                    case 'vec2':
+                        compute.uniformsData.append(glm.vec2(0.0, 0.0))
+                    case 'vec3':
+                        compute.uniformsData.append(glm.vec3(0.0, 0.0, 0.0))
+                    case 'vec4':
+                        compute.uniformsData.append(glm.vec4(0.0, 0.0, 0.0, 0.0))
+                    case 'ivec2':
+                        compute.uniformsData.append(glm.ivec2(0, 0))
+                    case 'ivec3':
+                        compute.uniformsData.append(glm.ivec3(0, 0, 0))
+                    case 'ivec4':
+                        compute.uniformsData.append(glm.ivec4(0, 0, 0, 0))
+                    case 'uvec2':
+                        compute.uniformsData.append(glm.uvec2(0, 0))
+                    case 'uvec3':
+                        compute.uniformsData.append(glm.uvec3(0, 0, 0))
+                    case 'uvec4':
+                        compute.uniformsData.append(glm.uvec4(0, 0, 0, 0))
+                    case 'dvec2':
+                        compute.uniformsData.append(glm.dvec2(0.0, 0.0))
+                    case 'dvec3':
+                        compute.uniformsData.append(glm.dvec3(0.0, 0.0, 0.0))
+                    case 'dvec4':
+                        compute.uniformsData.append(glm.dvec4(0.0, 0.0, 0.0, 0.0))
+                    case 'mat2':
+                        compute.uniformsData.append(glm.mat2(0.0, 0.0, 0.0, 0.0))
+                    case 'mat3':
+                        compute.uniformsData.append(glm.mat3(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0))
+                    case 'mat4':
+                        compute.uniformsData.append(glm.mat4(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0))
+        
+        for uniformName, uniformType in compute.uniformsDictionary.items():
+            if uniformName not in compute.guiData:
+                match uniformType:
+                    case 'float':
+                        compute.guiData[uniformName] = GUIData(0.01, 0.0, 100.0)
+                    case _:
+                        compute.guiData[uniformName] = GUIData(1, 0, 1000)
 
     def on_update_entity(self, ts: float, entity: Entity, components: Component | tuple[Component]):
         compute: ComputeComponent = components
@@ -38,7 +91,7 @@ class OpenGLComputePipelineSystem(System):
         for uniformName, uniformType in compute.uniformsDictionary.items():
             location = gl.glGetUniformLocation(compute.ID, uniformName)
             uniformDataIndex = list(compute.uniformsDictionary.keys()).index(uniformName)
-            MaterialInstance.update_uniform(location, uniformName, compute.uniformsData[uniformDataIndex], uniformType)
+            MaterialInstance.update_uniform(MaterialInstance, location, uniformName, compute.uniformsData[uniformDataIndex], uniformType)
 
         gl.glDispatchCompute(compute.workGroupsX, compute.workGroupsY, compute.workGroupsZ)
         gl.glMemoryBarrier(gl.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT)

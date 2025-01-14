@@ -277,7 +277,6 @@ class EditorPanelSystem(System):
                 if modified:
                     info.tag = text                            
                 imgui.separator()
-            #print(ComponentLib().Transform.__name__)
             if SceneManager().get_active_scene().has_component(EditorVisibleComponent.SELECTED_ENTITY, ComponentLib().Transform):
                 if imgui.tree_node_ex('Transform', flags):
                     transform: ComponentLib().Transform = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, ComponentLib().Transform)
@@ -355,45 +354,19 @@ class EditorPanelSystem(System):
                     terrain: TerrainComponent = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, TerrainComponent)
                     cameraTransform: TransformComponent = SceneManager().get_active_scene().get_component(terrain.camera, TransformComponent)
                     material: MaterialComponent = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, MaterialComponent)
+                    compute: ComputeComponent = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, ComputeComponent)
                     if terrain.cameraCoords != cameraTransform.translation.xz:
                         terrain.cameraCoords = cameraTransform.translation.xz
+                        compute.uniformsData[list(compute.uniformsDictionary.keys()).index('cameraCoords')] = terrain.cameraCoords
                         terrain.cameraMoved = True
                     scaleChanged, newScale = imgui.input_int('Scale', terrain.scale, 1)
                     elevationScaleChanged, newElevationScale = imgui.input_int('Elevation Scale', terrain.elevationScale, 1)
-                    fallOffChanged, newFallOff = imgui.checkbox('Enable fall off', terrain.fallOffEnabled)
-                    typeChanged, newType = imgui.combo('Fall off type', int(terrain.fallOffType), ['Circle', 'Rectangle'])
-                    aChanged, newA = imgui.drag_float('a', terrain.a, 0.01)
-                    bChanged, newB = imgui.drag_float('b', terrain.b, 0.01)
-                    fallOffHeightChanged, newFallOffHeight = imgui.drag_float('Fall off height', terrain.fallOffHeight, 0.1, 0.0)
-                    underWaterRavinesChanged, newUnderWaterRavines = imgui.checkbox('Under water ravines', terrain.underWaterRavines)
                     terrainChanged, newMapSize = imgui.drag_int('Map size', terrain.mapSize, 8, 8, 512)
-                    seedChanged, newSeed = imgui.input_int('Seed', terrain.noiseSettings.seed, 1)
-                    octavesChanged, newOctaves = imgui.input_int('Ocatves', terrain.noiseSettings.octaves, 1)
-                    frequencyChanged, newFrequency = imgui.drag_float('Frequency', terrain.noiseSettings.frequency, 0.01)
-                    persistenceChanged, newPersistence = imgui.drag_float('Persistence', terrain.noiseSettings.persistence, 0.01)
-                    lacunarityChanged, newLacunarity = imgui.drag_float('Lacunarity', terrain.noiseSettings.lacunarity, 0.01)
-                    turbulanceChanged, newTurbulance = imgui.checkbox('Turbulance', terrain.noiseSettings.Turbulance)
-                    ridgesChanged, newRidges = imgui.checkbox('Ridges', terrain.noiseSettings.Ridges)
-                    ridgesStrengthChanged, newRidgesStrength = imgui.drag_int('Ridges Strength', terrain.noiseSettings.RidgesStrength, 1, 0, 5)
-                    if seedChanged: terrain.noiseSettings.seed = newSeed
-                    if octavesChanged: terrain.noiseSettings.octaves = newOctaves
-                    if frequencyChanged: terrain.noiseSettings.frequency = newFrequency
-                    if persistenceChanged: terrain.noiseSettings.persistence = newPersistence
-                    if lacunarityChanged: terrain.noiseSettings.lacunarity = newLacunarity
-                    if turbulanceChanged: terrain.noiseSettings.Turbulance = newTurbulance
-                    if ridgesChanged: terrain.noiseSettings.Ridges = newRidges
-                    if ridgesStrengthChanged: terrain.noiseSettings.RidgesStrength = newRidgesStrength
                     imgui.button('Generate Terrain', imgui.ImVec2(60, 10))
                     if imgui.is_item_clicked():
                         terrain.generate = True
                     if scaleChanged: terrain.scale = newScale
                     if elevationScaleChanged: terrain.elevationScale = newElevationScale
-                    if fallOffChanged: terrain.fallOffEnabled = newFallOff
-                    if typeChanged: terrain.fallOffType = newType
-                    if aChanged: terrain.a = newA
-                    if bChanged: terrain.b = newB
-                    if fallOffHeightChanged: terrain.fallOffHeight = newFallOffHeight
-                    if underWaterRavinesChanged: terrain.underWaterRavines = newUnderWaterRavines
                     if terrainChanged: terrain.mapSize = newMapSize
                     if material.instance.has_uniform('scale'):
                         material.instance.data.scale = terrain.scale
@@ -403,34 +376,40 @@ class EditorPanelSystem(System):
                         material.instance.data.mapSize = terrain.mapSize / 8
                     if material.instance.has_uniform('cameraCoords'):
                         material.instance.data.cameraCoords = terrain.cameraCoords
-                    if material.instance.has_uniform('a'):
-                        material.instance.data.a = terrain.a
-                    if material.instance.has_uniform('b'):
-                        material.instance.data.b = terrain.b
-                    if material.instance.has_uniform('fallOffHeight'):
-                        material.instance.data.fallOffHeight = terrain.fallOffHeight
-                    if material.instance.has_uniform('fallOffEnabled'):
-                        material.instance.data.fallOffEnabled = terrain.fallOffEnabled
-                    if material.instance.has_uniform('fallOffType'):
-                        material.instance.data.fallOffType = terrain.fallOffType
-                    if material.instance.has_uniform('underWaterRavines'):
-                        material.instance.data.underWaterRavines = terrain.underWaterRavines
-                    if material.instance.has_uniform('seed'):
-                        material.instance.data.seed = terrain.noiseSettings.seed
-                    if material.instance.has_uniform('octaves'):
-                        material.instance.data.octaves = terrain.noiseSettings.octaves
-                    if material.instance.has_uniform('frequency'):
-                        material.instance.data.frequency = terrain.noiseSettings.frequency
-                    if material.instance.has_uniform('persistence'):
-                        material.instance.data.persistence = terrain.noiseSettings.persistence
-                    if material.instance.has_uniform('lacunarity'):
-                        material.instance.data.lacunarity = terrain.noiseSettings.lacunarity
-                    if material.instance.has_uniform('turbulance'):
-                        material.instance.data.Turbulance = terrain.noiseSettings.Turbulance
-                    if material.instance.has_uniform('Ridges'):
-                        material.instance.data.Ridges = terrain.noiseSettings.Ridges
-                    if material.instance.has_uniform('ridgesStrength'):
-                        material.instance.data.RidgesStrength = terrain.noiseSettings.RidgesStrength
+                    
+                    imgui.tree_pop()
+                imgui.separator()
+
+            if SceneManager().get_active_scene().has_component(EditorVisibleComponent.SELECTED_ENTITY, ComputeComponent):
+                if imgui.tree_node_ex('ComputeComponent', flags):
+                    compute: ComputeComponent = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, ComputeComponent)
+
+                    for uniformName, uniformType in compute.uniformsDictionary.items():
+                        index = list(compute.uniformsDictionary.keys()).index(uniformName)
+                        changed, newValue = (0, 0)
+                        match uniformType:
+                            case 'float':
+                                match compute.guiData[uniformName].type:
+                                    case GUIType.DRAG:    
+                                        changed, newValue = imgui.drag_float(uniformName, compute.uniformsData[index], compute.guiData[uniformName].speed, compute.guiData[uniformName].min, compute.guiData[uniformName].max)
+                                    case GUIType.INPUT:
+                                        changed, newValue = imgui.input_float(uniformName, compute.uniformsData[index], compute.guiData[uniformName].speed)
+                                    case GUIType.CHECKBOX:
+                                        changed, newValue = imgui.checkbox(uniformName, compute.uniformsData[index])
+                                    case GUIType.COMBO:
+                                        changed, newValue = imgui.combo(uniformName, int(compute.uniformsData[index]), compute.guiData[uniformName].comboValues)
+                            case 'int':
+                                match compute.guiData[uniformName].type:
+                                    case GUIType.DRAG:    
+                                        changed, newValue = imgui.drag_int(uniformName, compute.uniformsData[index], compute.guiData[uniformName].speed, compute.guiData[uniformName].min, compute.guiData[uniformName].max)
+                                    case GUIType.INPUT:
+                                        changed, newValue = imgui.input_int(uniformName, compute.uniformsData[index], compute.guiData[uniformName].speed)
+                                    case GUIType.CHECKBOX:
+                                        changed, newValue = imgui.checkbox(uniformName, compute.uniformsData[index])
+                                    case GUIType.COMBO:
+                                        changed, newValue = imgui.combo(uniformName, int(compute.uniformsData[index]), compute.guiData[uniformName].comboValues)
+                        if changed: compute.uniformsData[index] = newValue
+
                     imgui.tree_pop()
                 imgui.separator()
 

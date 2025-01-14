@@ -1,25 +1,30 @@
 from pyGandalf.utilities.definitions import SHADERS_PATH
 
 import OpenGL.GL as gl
+import OpenGL.GL.NV.mesh_shader as nv
 
 import os
 import re
 from pathlib import Path
 
 class ShaderData:
-    def __init__(self, shader_program, name: str, vs_path: Path, fs_path: Path, gs_path: Path, tcs_path: Path, tes_path: Path, vs_code: str, fs_code: str, gs_code: str, tcs_code: str, tes_code: str):
+    def __init__(self, shader_program, name: str, vs_path: Path, fs_path: Path, gs_path: Path, tcs_path: Path, tes_path: Path, 
+                 isMeshShader: bool, task_path: Path, vs_code: str, fs_code: str, gs_code: str, tcs_code: str, tes_code: str, task_code: str):
         self.name = name
         self.vs_path = vs_path
         self.fs_path = fs_path
         self.gs_path = gs_path
         self.tcs_path = tcs_path
         self.tes_path = tes_path
+        self.task_path = task_path
         self.shader_program = shader_program
+        self.isMeshShader = isMeshShader
         self.vs_code = vs_code
         self.fs_code = fs_code
         self.gs_code = gs_code
         self.tcs_code = tcs_code
         self.tes_code = tes_code
+        self.task_code = task_code
 
 class OpenGLShaderLib(object):
     def __new__(cls):
@@ -38,8 +43,13 @@ class OpenGLShaderLib(object):
 
         return shader
 
-    def create_shader_program(cls, vertex_shader_code, fragment_shader_code, geometry_shader_code=None, tessellation_control_shader_code=None, tessellation_evaluation_shader_code=None):
-        vertex_shader = cls.instance.compile_shader(vertex_shader_code, gl.GL_VERTEX_SHADER)
+    def create_shader_program(cls, vertex_shader_code, fragment_shader_code, geometry_shader_code=None, tessellation_control_shader_code=None, tessellation_evaluation_shader_code=None,
+                              isMehShader: bool=False, task_shader_code: Path=None):
+        vertex_flag = gl.GL_VERTEX_SHADER
+        if isMehShader:
+            vertex_flag = nv.GL_MESH_SHADER_NV
+
+        vertex_shader = cls.instance.compile_shader(vertex_shader_code, vertex_flag)
         fragment_shader = cls.instance.compile_shader(fragment_shader_code, gl.GL_FRAGMENT_SHADER)
 
         if geometry_shader_code != None:
@@ -48,6 +58,9 @@ class OpenGLShaderLib(object):
             tessellation_control_shader = cls.instance.compile_shader(tessellation_control_shader_code, gl.GL_TESS_CONTROL_SHADER)
         if tessellation_evaluation_shader_code != None:
             tessellation_evaluation_shader = cls.instance.compile_shader(tessellation_evaluation_shader_code, gl.GL_TESS_EVALUATION_SHADER)
+
+        if task_shader_code != None:
+            task_shader = cls.instance.compile_shader(task_shader_code, nv.GL_TASK_SHADER_NV)
 
         shader_program = gl.glCreateProgram()
         gl.glAttachShader(shader_program, vertex_shader)
@@ -58,6 +71,8 @@ class OpenGLShaderLib(object):
             gl.glAttachShader(shader_program, tessellation_control_shader)
         if tessellation_evaluation_shader_code != None:
             gl.glAttachShader(shader_program, tessellation_evaluation_shader)
+        if task_shader_code != None:
+            gl.glAttachShader(shader_program, task_shader)
         gl.glLinkProgram(shader_program)
 
         if not gl.glGetProgramiv(shader_program, gl.GL_LINK_STATUS):
@@ -74,7 +89,8 @@ class OpenGLShaderLib(object):
 
         return shader_program
     
-    def build(cls, name: str, vs_path: Path, fs_path: Path, gs_path: Path=None, tcs_path: Path=None, tes_path: Path=None) -> int:
+    def build(cls, name: str, vs_path: Path, fs_path: Path, gs_path: Path=None, tcs_path: Path=None, tes_path: Path=None,
+              isMehShader: bool=False, task_path: Path=None) -> int:
         """Builds a new shader (if one does not already exists with that name) and returns its shader program.
 
         Args:
@@ -96,20 +112,26 @@ class OpenGLShaderLib(object):
         gs_code = None
         tcs_code = None
         tes_code = None
+        task_code = None
 
-        if gs_path != None:
+        if (gs_path != None) and (not isMehShader):
             gs_code = cls.instance.load_from_file(gs_path)
 
-        if tcs_path != None:
+        if (tcs_path != None) and (not isMehShader):
             tcs_code = cls.instance.load_from_file(tcs_path)
-        if tes_path != None:
+        if (tes_path != None) and (not isMehShader):
             tes_code = cls.instance.load_from_file(tes_path)
+        if (task_path != None) and isMehShader:
+            task_code = cls.instance.load_from_file(task_path)
+        else:
+            task_path = None
 
         vs_rel_path = Path(os.path.relpath(vs_path, SHADERS_PATH))
         fs_rel_path = Path(os.path.relpath(fs_path, SHADERS_PATH))
         gs_rel_path = None
         tcs_rel_path = None
         tes_rel_path = None
+        task_rel_path = None
 
         if gs_path != None:
             gs_rel_path = Path(os.path.relpath(gs_path, SHADERS_PATH))
@@ -117,9 +139,12 @@ class OpenGLShaderLib(object):
             tcs_rel_path = Path(os.path.relpath(tcs_path, SHADERS_PATH))
         if tcs_path != None:
             tes_rel_path = Path(os.path.relpath(tes_path, SHADERS_PATH))
+        if task_path != None:
+            task_rel_path = Path(os.path.relpath(task_path, SHADERS_PATH))
 
-        shader_program = cls.instance.create_shader_program(vs_code, fs_code, gs_code, tcs_code, tes_code)
-        cls.instance.shaders[name] = ShaderData(shader_program, name, vs_rel_path, fs_rel_path, gs_rel_path, tcs_rel_path, tes_rel_path, vs_code, fs_code, gs_code, tcs_code, tes_code)
+        shader_program = cls.instance.create_shader_program(vs_code, fs_code, gs_code, tcs_code, tes_code, isMehShader, task_code)
+        cls.instance.shaders[name] = ShaderData(shader_program, name, vs_rel_path, fs_rel_path, gs_rel_path, tcs_rel_path, tes_rel_path, isMehShader, 
+                                                task_rel_path, vs_code, fs_code, gs_code, tcs_code, tes_code, task_code)
         
         return shader_program
     

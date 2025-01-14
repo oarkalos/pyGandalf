@@ -127,24 +127,17 @@ class WebGPUComputeComponent(Component):
         self.dispatch = False
 
 class TerrainComponent(Component):
-    def __init__(self, scale, elevationScale, mapSize, fallOffEnabled, fallOffType, a, b, fallOffHeight, patch_resolution, vertices_per_patch, camera = None):
-        self.noiseSettings = None
+    def __init__(self, scale, elevationScale, mapSize, patch_resolution, vertices_per_patch, camera = None):
         self.minHeight = 0.0
         self.maxHeight = 0.0
         self.scale : float = scale
         self.elevationScale : float = elevationScale
         self.mapSize : int = mapSize
-        self.fallOffEnabled : bool = fallOffEnabled
-        self.underWaterRavines: bool = False
-        self.fallOffType : int = fallOffType
         self.patch_resolution : int = patch_resolution
         self.vertices_per_patch : int = vertices_per_patch
         self.cameraCoords: glm.vec2 = glm.vec2(0.0, 0.0)
         self.camera: Entity = camera
 
-        self.a : float = a
-        self.b : float = b
-        self.fallOffHeight : float = fallOffHeight
         self.generate: bool = False
         self.cameraMoved: bool = False
 
@@ -155,15 +148,32 @@ class TerrainComponent(Component):
         self.vertices = []
         self.indices = []
 
+from enum import Enum
+
+class GUIType(Enum):
+    DRAG = 0
+    INPUT = 1
+    CHECKBOX = 2
+    COMBO = 3
+
+class GUIData:
+    def __init__(self, speed = 0, min = 0, max = 0, type: GUIType = GUIType.DRAG, comboValues = ['', '']):
+        self.speed = speed
+        self.min = min
+        self.max = max
+        self.type = type
+        self.comboValues = comboValues
+
 class ComputeComponent(Component):
-    def __init__(self, compute_shader: str, textures: list[int], x: int, y: int, z: int):
+    def __init__(self, compute_shader: str, textures: list[int], x: int, y: int, z: int, uniformsData = [], guiData: dict[str, GUIData] = {}):
         self.shader: str = compute_shader
         self.textures: list[int] = textures
         self.dispatch = False
 
         self.ID: int = 0
         self.uniformsDictionary: dict[str, str] = {}
-        self.uniformsData = []
+        self.uniformsData = uniformsData
+        self.guiData: dict[str, GUIData] = guiData
         self.workGroupsX = x
         self.workGroupsY = y
         self.workGroupsZ = z

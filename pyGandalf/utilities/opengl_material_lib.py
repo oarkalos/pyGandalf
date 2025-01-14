@@ -9,10 +9,11 @@ import re
 from dataclasses import dataclass
 
 class MaterialInstance:
-    def __init__(self, name, data, descriptor, shader_program, shader_params = []):
+    def __init__(self, name, data, descriptor, isMeshShader, shader_program, shader_params = []):
         self.name = name
         self.data = data
         self.descriptor = descriptor
+        self.isMeshShader = isMeshShader
         self.shader_program = shader_program
         self.shader_params = shader_params
 
@@ -240,25 +241,9 @@ class MaterialData:
         self.snowColor = glm.vec4(0.93, 0.83, 0.83, 1.0)
         self.grassColor = glm.vec4(0.26, 0.44, 0.2, 1.0)
         self.sandColor = glm.vec4(1.0, 0.7, 0.54, 1.0)
-        self.tiling = glm.ivec2(1, 1)
-        self.fallOffEnabled : bool = False
-        self.underWaterRavines: bool = False
-        self.fallOffType : int = 0
-        self.seed: int = 0
+        self.tiling = glm.ivec2(10, 10)
 
-        self.a : float = 3.0
-        self.b : float = 0.5
-        self.fallOffHeight : float = 0.2
-
-        self.octaves = 12
-        self.frequency = 2.0
-        self.persistence = 0.5
-        self.lacunarity = 2.0
-        self.Ridges = False
-        self.RidgesStrength = 2
-        self.Turbulance = False
         self.useTextures = False
-        self.typeOfNoise = 0
 
     def __eq__(self, other):
         if self.base_template != other.base_template:
@@ -313,6 +298,7 @@ class OpenGLMaterialLib(object):
         shader_params_geometry = {}
         shader_params_tess_control = {}
         shader_params_tess_eval = {}
+        shader_params_task = {}
         
         if shader_data.gs_code != None:
             shader_params_geometry = OpenGLShaderLib().parse(shader_data.gs_code)
@@ -320,9 +306,11 @@ class OpenGLMaterialLib(object):
             shader_params_tess_control = OpenGLShaderLib().parse(shader_data.tcs_code)
         if shader_data.tes_code != None:
             shader_params_tess_eval = OpenGLShaderLib().parse(shader_data.tes_code)
+        if shader_data.task_code != None:
+            shader_params_task = OpenGLShaderLib().parse(shader_data.task_code)
 
-        cls.instance.cached_materials[data] = MaterialInstance(name, data, descriptor, shader_program, shader_params_vertex | shader_params_fragment | shader_params_geometry | shader_params_tess_control | shader_params_tess_eval)
-        cls.instance.materials[name] = MaterialInstance(name, data, descriptor, shader_program, shader_params_vertex | shader_params_fragment | shader_params_geometry | shader_params_tess_control | shader_params_tess_eval)
+        cls.instance.cached_materials[data] = MaterialInstance(name, data, descriptor, shader_data.isMeshShader, shader_program, shader_params_vertex | shader_params_fragment | shader_params_geometry | shader_params_tess_control | shader_params_tess_eval | shader_params_task)
+        cls.instance.materials[name] = MaterialInstance(name, data, descriptor, shader_data.isMeshShader, shader_program, shader_params_vertex | shader_params_fragment | shader_params_geometry | shader_params_tess_control | shader_params_tess_eval | shader_params_task)
 
         return cls.instance.materials[name]
 

@@ -5,6 +5,7 @@ from pyGandalf.utilities.opengl_material_lib import OpenGLMaterialLib
 from pyGandalf.utilities.logger import logger
 
 import OpenGL.GL as gl
+import OpenGL.GL.NV.mesh_shader as nv
 import numpy as np
 import glm
 
@@ -149,10 +150,13 @@ class OpenGLRenderer(BaseRenderer):
                 material.instance.set_uniform(textures[index], int(slot))
 
     def draw(cls, render_data, material):
-        if material.instance.descriptor.primitive == gl.GL_PATCHES:
-            gl.glDrawArrays(gl.GL_PATCHES, 0, material.instance.descriptor.vertices_per_patch * material.instance.descriptor.patch_resolution * material.instance.descriptor.patch_resolution)
+        if material.instance.isMeshShader:
+            nv.glDrawMeshTasksNV(0, 16384)
         else:
-            gl.glDrawArrays(material.instance.descriptor.primitive, 0, render_data.attributes[0].size)
+            if material.instance.descriptor.primitive == gl.GL_PATCHES:
+                gl.glDrawArrays(gl.GL_PATCHES, 0, material.instance.descriptor.vertices_per_patch * material.instance.descriptor.patch_resolution * material.instance.descriptor.patch_resolution)
+            else:
+                gl.glDrawArrays(material.instance.descriptor.primitive, 0, render_data.attributes[0].size)
 
         # Unbind vao
         gl.glBindVertexArray(0)

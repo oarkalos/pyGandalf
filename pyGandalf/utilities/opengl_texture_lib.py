@@ -107,50 +107,6 @@ class OpenGLTextureLib(object):
                 data.height = img.height
 
             return cls.instance.textures[name].slot
-        """elif type(data.path) is list or type(data.image_bytes) is list:
-            assert descriptor.dimention == TextureDimension.CUBE, "Multiple texture paths and multiple byte arrays are only supported for cube dimetion type"
-
-            if data.path != None and type(data.path) is list:
-                texture_id = gl.glGenTextures(1)        
-                gl.glBindTexture(gl.GL_TEXTURE_CUBE_MAP, texture_id)
-
-                for i, p in enumerate(data.path):
-                    img = Image.open(p)
-                    if descriptor.flip:
-                        img = img.transpose(Image.FLIP_TOP_BOTTOM)
-                    img_bytes = img.convert("RGBA").tobytes("raw", "RGB", 0, -1)
-
-                    gl.glTexImage2D(
-                        gl.GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-                        0, descriptor.internal_format, img.width, img.height, 0, descriptor.format, descriptor.type, img_bytes
-                    )
-
-                    if data.path is not None:
-                        data.path[i] = Path(os.path.relpath(p, TEXTURES_PATH))
-            elif data.path == None and type(data.image_bytes) is list:
-                texture_id = gl.glGenTextures(1)
-                gl.glBindTexture(gl.GL_TEXTURE_CUBE_MAP, texture_id)
-
-                for i, b in enumerate(data.image_bytes):
-                    gl.glTexImage2D(
-                        gl.GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
-                        0, descriptor.internal_format, data.width, data.height, 0, descriptor.format, descriptor.type, b
-                    )
-
-            gl.glTexParameteri(gl.GL_TEXTURE_CUBE_MAP, gl.GL_TEXTURE_MAG_FILTER, gl.GL_LINEAR)
-            gl.glTexParameteri(gl.GL_TEXTURE_CUBE_MAP, gl.GL_TEXTURE_MIN_FILTER, gl.GL_LINEAR)
-            gl.glTexParameteri(gl.GL_TEXTURE_CUBE_MAP, gl.GL_TEXTURE_WRAP_S, gl.GL_CLAMP_TO_EDGE)
-            gl.glTexParameteri(gl.GL_TEXTURE_CUBE_MAP, gl.GL_TEXTURE_WRAP_T, gl.GL_CLAMP_TO_EDGE)
-            gl.glTexParameteri(gl.GL_TEXTURE_CUBE_MAP, gl.GL_TEXTURE_WRAP_R, gl.GL_CLAMP_TO_EDGE)
-
-            gl.glBindTexture(gl.GL_TEXTURE_CUBE_MAP, 0)
-
-            texture_instance : TextureInstance = TextureInstance(texture_id, cls.instance.current_slot, name, data, descriptor)
-            cls.instance.textures[name] = texture_instance
-
-            cls.instance.current_slot += 1
-
-            return texture_instance.slot"""
     
     def build(cls, name: str, data: TextureData, descriptor: TextureDescriptor = TextureDescriptor()):
         """Builds a new texture (if one does not already exists with that name) and returns its slot.
