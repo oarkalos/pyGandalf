@@ -14,3 +14,7 @@ Then from the properties window press the generate button to generate the terrai
 
 The scale controls the size of the terrain and the map size parameter controls the resolution of the heightmap. The rest are
 the parameters of the noise, you can try and change them to see how the terrain changes.
+
+## Camera controls
+
+WASD + right click mouse
