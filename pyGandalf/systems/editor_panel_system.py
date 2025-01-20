@@ -362,7 +362,7 @@ class EditorPanelSystem(System):
                     scaleChanged, newScale = imgui.input_int('Scale', terrain.scale, 1)
                     elevationScaleChanged, newElevationScale = imgui.input_int('Elevation Scale', terrain.elevationScale, 1)
                     terrainChanged, newMapSize = imgui.drag_int('Map size', terrain.mapSize, 8, 8, 512)
-                    imgui.button('Generate Terrain', imgui.ImVec2(60, 10))
+                    imgui.button('Generate', imgui.ImVec2(60, 15))
                     if imgui.is_item_clicked():
                         terrain.generate = True
                     if scaleChanged: terrain.scale = newScale
@@ -385,6 +385,7 @@ class EditorPanelSystem(System):
                     compute: ComputeComponent = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, ComputeComponent)
 
                     for uniformName, uniformType in compute.uniformsDictionary.items():
+                        if compute.guiData[uniformName].hidden: continue
                         index = list(compute.uniformsDictionary.keys()).index(uniformName)
                         changed, newValue = (0, 0)
                         match uniformType:
@@ -409,6 +410,10 @@ class EditorPanelSystem(System):
                                     case GUIType.COMBO:
                                         changed, newValue = imgui.combo(uniformName, int(compute.uniformsData[index]), compute.guiData[uniformName].comboValues)
                         if changed: compute.uniformsData[index] = newValue
+
+                    imgui.button('Save', imgui.ImVec2(60, 15))
+                    if imgui.is_item_clicked():
+                        compute.save = True
 
                     imgui.tree_pop()
                 imgui.separator()

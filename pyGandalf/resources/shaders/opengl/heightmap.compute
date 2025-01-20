@@ -23,8 +23,13 @@ uniform float fallOffHeight = 0.2;
 uniform float a = 2.2;
 uniform float b = 0.4;
 uniform int underWaterRavines = 0;
-
 uniform vec2 cameraCoords;
+uniform int mapSize = 512;
+
+//Clamp height
+uniform int clampHeight = 0;
+uniform float minHeight = 0.0;
+uniform float maxHeight = 10.0;
 
 float invLerp(float a, float b, float v){
     return ((v - a) / (b - a));
@@ -147,12 +152,14 @@ float fractalPerlinNoise(float x, float z){
         tmpAmplitude *= persistence;
     }
     if(fallOffEnabled == 1){
-      float xCoord = ((x / (scale / 2)) + 1) / 2;
-      float zCoord = ((z / (scale / 2)) + 1) / 2;
+      float xCoord = ((x / 500.0) + 1) / 2;
+      float zCoord = ((z / 500.0) + 1) / 2;
       height = ApplyFallOff(xCoord, zCoord, height);
     }
     height *= 1.2;
-    //height = clamp(height, -1.2, 1.2);
+    if(clampHeight == 1){
+      height = clamp(height, minHeight, maxHeight);
+    }
     height = (height + 1.0) * 0.5;
     return height;
 }
@@ -161,7 +168,8 @@ void main() {
     vec4 value = vec4(0.0, 0.0, 0.0, 1.0);
     ivec2 texelCoord = ivec2(gl_GlobalInvocationID.xy);
 
-    float height = fractalPerlinNoise(texelCoord.x + cameraCoords.x, texelCoord.y + cameraCoords.y) / 2.0;
+    float range = 511.0 / (mapSize - 1);
+    float height = fractalPerlinNoise(float(texelCoord.x * range + cameraCoords.x), float(texelCoord.y * range + cameraCoords.y)) / 2.0;
 	
     value.x = height;
     value.y = height;

@@ -1,0 +1,412 @@
+#usda 1.0
+
+def "Hierachy"
+{
+    def "Entity5216513b1ca44322a07286006099b7c5"
+    {
+        custom bool enabled = 1
+        custom string id = "5216513b1ca44322a07286006099b7c5"
+
+        def "InfoComponent"
+        {
+            custom string dict = '{"py/object": "pyGandalf.scene.components.InfoComponent", "tag": "root", "enabled": true}'
+        }
+
+        def "TransformComponent"
+        {
+            custom string dict = '{"py/object": "pyGandalf.scene.components.TransformComponent", "translation": {"py/object": "glm.vec3", "py/state": {"py/tuple": [0.0, 0.0, 0.0]}}, "rotation": {"py/object": "glm.vec3", "py/state": {"py/tuple": [0.0, 0.0, 0.0]}}, "scale": {"py/object": "glm.vec3", "py/state": {"py/tuple": [1.0, 1.0, 1.0]}}, "local_matrix": {"py/object": "glm.mat4x4", "py/state": {"py/tuple": [{"py/tuple": [1.0, 0.0, 0.0, 0.0]}, {"py/tuple": [0.0, 1.0, 0.0, 0.0]}, {"py/tuple": [0.0, 0.0, 1.0, 0.0]}, {"py/tuple": [0.0, 0.0, 0.0, 1.0]}]}}, "world_matrix": {"py/object": "glm.mat4x4", "py/state": {"py/tuple": [{"py/tuple": [1.0, 0.0, 0.0, 0.0]}, {"py/tuple": [0.0, 1.0, 0.0, 0.0]}, {"py/tuple": [0.0, 0.0, 1.0, 0.0]}, {"py/tuple": [0.0, 0.0, 0.0, 1.0]}]}}, "quaternion": {"py/object": "glm.quat", "py/state": {"py/tuple": [1.0, 0.0, 0.0, 0.0]}}, "dirty": false, "static": false}'
+        }
+
+        def "LinkComponent"
+        {
+            custom string dict = '{"py/object": "pyGandalf.scene.components.LinkComponent", "parent_id": 0, "parent": null, "prev_parent": null, "children": [{"py/object": "pyGandalf.scene.entity.Entity", "id": {"py/object": "uuid.UUID", "hex": "0ffc0070199e44e6b82b1ce974bc5b9d"}, "enabled": true}, {"py/object": "pyGandalf.scene.entity.Entity", "id": {"py/object": "uuid.UUID", "hex": "f7b10935d8e8486f8fb7eeef04032d67"}, "enabled": true}, {"py/object": "pyGandalf.scene.entity.Entity", "id": {"py/object": "uuid.UUID", "hex": "47b0a9789212407a88841ce15894e273"}, "enabled": true}]}'
+        }
+    }
+
+    def "Entity0ffc0070199e44e6b82b1ce974bc5b9d"
+    {
+        custom bool enabled = 1
+        custom string id = "0ffc0070199e44e6b82b1ce974bc5b9d"
+
+        def "InfoComponent"
+        {
+            custom string dict = '{"py/object": "pyGandalf.scene.components.InfoComponent", "tag": "camera", "enabled": true}'
+        }
+
+        def "TransformComponent"
+        {
+            custom string dict = '{"py/object": "pyGandalf.scene.components.TransformComponent", "translation": {"py/object": "glm.vec3", "py/state": {"py/tuple": [-112.2751693725586, 19.800798416137695, 35.86029052734375]}}, "rotation": {"py/object": "glm.vec3", "py/state": {"py/tuple": [-15.313091278076172, 272.0028381347656, 0.0]}}, "scale": {"py/object": "glm.vec3", "py/state": {"py/tuple": [1.0, 1.0, 1.0]}}, "local_matrix": {"py/object": "glm.mat4x4", "py/state": {"py/tuple": [{"py/tuple": [0.03494894504547119, 0.0, 0.9993890523910522, 0.0]}, {"py/tuple": [0.26393207907676697, 0.9644970893859863, -0.009229794144630432, 0.0]}, {"py/tuple": [-0.9639078378677368, 0.26409339904785156, 0.033708155155181885, 0.0]}, {"py/tuple": [-112.2751693725586, 19.800798416137695, 35.86029052734375, 1.0]}]}}, "world_matrix": {"py/object": "glm.mat4x4", "py/state": {"py/tuple": [{"py/tuple": [0.03494894504547119, 0.0, 0.9993890523910522, 0.0]}, {"py/tuple": [0.26393207907676697, 0.9644970893859863, -0.009229794144630432, 0.0]}, {"py/tuple": [-0.9639078378677368, 0.26409339904785156, 0.033708155155181885, 0.0]}, {"py/tuple": [-112.2751693725586, 19.800798416137695, 35.86029052734375, 1.0]}]}}, "quaternion": {"py/object": "glm.quat", "py/state": {"py/tuple": [-0.7129435539245605, 0.09584321081638336, 0.6884475350379944, 0.092550128698349]}}, "dirty": false, "static": false}'
+        }
+
+        def "LinkComponent"
+        {
+            custom string dict = '{"py/object": "pyGandalf.scene.components.LinkComponent", "parent_id": {"py/object": "uuid.UUID", "hex": "5216513b1ca44322a07286006099b7c5"}, "parent": {"py/object": "pyGandalf.scene.entity.Entity", "id": {"py/id": 1}, "enabled": true}, "prev_parent": {"py/id": 2}, "children": []}'
+        }
+
+        def "CameraComponent"
+        {
+            custom string dict = '{"py/object": "pyGandalf.scene.components.CameraComponent", "zoom_level": 1.2, "fov": 45, "near": 0.1, "far": 2000, "aspect_ratio": 2.0422163588390503, "type": {"py/reduce": [{"py/type": "pyGandalf.scene.components.CameraComponent.Type"}, {"py/tuple": [1]}]}, "view": {"py/object": "glm.mat4x4", "py/state": {"py/tuple": [{"py/tuple": [0.03494894877076149, 0.26393207907676697, -0.9639079570770264, -0.0]}, {"py/tuple": [7.450581485102248e-09, 0.9644971489906311, 0.26409342885017395, -0.0]}, {"py/tuple": [0.9993891716003418, -0.009229786694049835, 0.03370815888047218, -0.0]}, {"py/tuple": [-31.91448402404785, 10.866188049316406, -114.66098022460938, 1.0]}]}}, "projection": {"py/object": "glm.mat4x4", "py/state": {"py/tuple": [{"py/tuple": [1.1821537017822266, 0.0, 0.0, 0.0]}, {"py/tuple": [0.0, 2.4142134189605713, 0.0, 0.0]}, {"py/tuple": [0.0, 0.0, -1.000100016593933, -1.0]}, {"py/tuple": [0.0, 0.0, -0.2000100016593933, 0.0]}]}}, "view_projection": {"py/object": "glm.mat4x4", "py/state": {"py/tuple": [{"py/tuple": [0.04131503030657768, 0.6371883749961853, 0.9640043377876282, 0.9639079570770264]}, {"py/tuple": [8.807732321258754e-09, 2.3285019397735596, -0.26411983370780945, -0.26409342885017395]}, {"py/tuple": [1.1814316511154175, -0.022282674908638, -0.03371153026819229, -0.03370815888047218]}, {"py/tuple": [-37.72782516479492, 26.23329734802246, 114.4724349975586, 114.66098022460938]}]}}, "primary": true}'
+        }
+
+        def "CameraControllerComponent"
+        {
+            custom string dict = '{"py/object": "pyGandalf.scene.components.CameraControllerComponent", "front": {"py/object": "glm.vec3", "py/state": {"py/tuple": [0.9639078378677368, -0.26409339904785156, -0.033710598945617676]}}, "right": {"py/object": "glm.vec3", "py/state": {"py/tuple": [0.03495147451758385, -0.0, 0.9993889927864075]}}, "up": {"py/object": "glm.vec3", "py/state": {"py/tuple": [-0.2639320492744446, -0.9644971489906311, 0.00923045352101326]}}, "world_up": {"py/object": "glm.vec3", "py/state": {"py/tuple": [0.0, 1.0, 0.0]}}, "yaw": 182.002979999995, "pitch": 15.31308999999839, "movement_speed": 15, "mouse_sensitivity": 2, "zoom": 45.0, "prev_mouse_x": 591.0, "prev_mouse_y": 183.0}'
+        }
+    }
+
+    def "Entityf7b10935d8e8486f8fb7eeef04032d67"
+    {
+        custom bool enabled = 1
+        custom string id = "f7b10935d8e8486f8fb7eeef04032d67"
+
+        def "InfoComponent"
+        {
+            custom string dict = '{"py/object": "pyGandalf.scene.components.InfoComponent", "tag": "terrain", "enabled": true}'
+        }
+
+        def "TransformComponent"
+        {
+            custom string dict = '{"py/object": "pyGandalf.scene.components.TransformComponent", "translation": {"py/object": "glm.vec3", "py/state": {"py/tuple": [-112.2751693725586, 0.0, 35.86029052734375]}}, "rotation": {"py/object": "glm.vec3", "py/state": {"py/tuple": [0.0, 0.0, 0.0]}}, "scale": {"py/object": "glm.vec3", "py/state": {"py/tuple": [1.0, 1.0, 1.0]}}, "local_matrix": {"py/object": "glm.mat4x4", "py/state": {"py/tuple": [{"py/tuple": [1.0, 0.0, 0.0, 0.0]}, {"py/tuple": [0.0, 1.0, 0.0, 0.0]}, {"py/tuple": [0.0, 0.0, 1.0, 0.0]}, {"py/tuple": [-112.2751693725586, 0.0, 35.86029052734375, 1.0]}]}}, "world_matrix": {"py/object": "glm.mat4x4", "py/state": {"py/tuple": [{"py/tuple": [1.0, 0.0, 0.0, 0.0]}, {"py/tuple": [0.0, 1.0, 0.0, 0.0]}, {"py/tuple": [0.0, 0.0, 1.0, 0.0]}, {"py/tuple": [-112.2751693725586, 0.0, 35.86029052734375, 1.0]}]}}, "quaternion": {"py/object": "glm.quat", "py/state": {"py/tuple": [1.0, 0.0, 0.0, 0.0]}}, "dirty": false, "static": false}'
+        }
+
+        def "LinkComponent"
+        {
+            custom string dict = '{"py/object": "pyGandalf.scene.components.LinkComponent", "parent_id": {"py/object": "uuid.UUID", "hex": "5216513b1ca44322a07286006099b7c5"}, "parent": {"py/object": "pyGandalf.scene.entity.Entity", "id": {"py/id": 1}, "enabled": true}, "prev_parent": {"py/id": 2}, "children": []}'
+        }
+
+        def "StaticMeshComponent"
+        {
+            custom string dict = '{"py/object": "pyGandalf.scene.components.StaticMeshComponent", "name": "terrain_mesh", "attributes": [{"py/reduce": [{"py/function": "numpy._core.multiarray._reconstruct"}, {"py/tuple": [{"py/type": "numpy.ndarray"}, {"py/tuple": [0]}, {"py/b64": "Yg=="}]}, {"py/tuple": [1, {"py/tuple": [256, 3]}, {"py/reduce": [{"py/type": "numpy.dtype"}, {"py/tuple": ["f4", false, true]}, {"py/tuple": [3, "<", null, null, null, -1, -1, 0]}]}, false, {"py/b64": "AADIwgAAAAAAAMjCAACWwgAAAAAAAMjCAADIwgAAAAAAAJbCAACWwgAAAAAAAJbCAADIwgAAAAAAAJbCAACWwgAAAAAAAJbCAADIwgAAAAAAAEjCAACWwgAAAAAAAEjCAADIwgAAAAAAAEjCAACWwgAAAAAAAEjCAADIwgAAAAAAAMjBAACWwgAAAAAAAMjBAADIwgAAAAAAAMjBAACWwgAAAAAAAMjBAADIwgAAAAAAAAAAAACWwgAAAAAAAAAAAADIwgAAAAAAAAAAAACWwgAAAAAAAAAAAADIwgAAAAAAAMhBAACWwgAAAAAAAMhBAADIwgAAAAAAAMhBAACWwgAAAAAAAMhBAADIwgAAAAAAAEhCAACWwgAAAAAAAEhCAADIwgAAAAAAAEhCAACWwgAAAAAAAEhCAADIwgAAAAAAAJZCAACWwgAAAAAAAJZCAADIwgAAAAAAAJZCAACWwgAAAAAAAJZCAADIwgAAAAAAAMhCAACWwgAAAAAAAMhCAACWwgAAAAAAAMjCAABIwgAAAAAAAMjCAACWwgAAAAAAAJbCAABIwgAAAAAAAJbCAACWwgAAAAAAAJbCAABIwgAAAAAAAJbCAACWwgAAAAAAAEjCAABIwgAAAAAAAEjCAACWwgAAAAAAAEjCAABIwgAAAAAAAEjCAACWwgAAAAAAAMjBAABIwgAAAAAAAMjBAACWwgAAAAAAAMjBAABIwgAAAAAAAMjBAACWwgAAAAAAAAAAAABIwgAAAAAAAAAAAACWwgAAAAAAAAAAAABIwgAAAAAAAAAAAACWwgAAAAAAAMhBAABIwgAAAAAAAMhBAACWwgAAAAAAAMhBAABIwgAAAAAAAMhBAACWwgAAAAAAAEhCAABIwgAAAAAAAEhCAACWwgAAAAAAAEhCAABIwgAAAAAAAEhCAACWwgAAAAAAAJZCAABIwgAAAAAAAJZCAACWwgAAAAAAAJZCAABIwgAAAAAAAJZCAACWwgAAAAAAAMhCAABIwgAAAAAAAMhCAABIwgAAAAAAAMjCAADIwQAAAAAAAMjCAABIwgAAAAAAAJbCAADIwQAAAAAAAJbCAABIwgAAAAAAAJbCAADIwQAAAAAAAJbCAABIwgAAAAAAAEjCAADIwQAAAAAAAEjCAABIwgAAAAAAAEjCAADIwQAAAAAAAEjCAABIwgAAAAAAAMjBAADIwQAAAAAAAMjBAABIwgAAAAAAAMjBAADIwQAAAAAAAMjBAABIwgAAAAAAAAAAAADIwQAAAAAAAAAAAABIwgAAAAAAAAAAAADIwQAAAAAAAAAAAABIwgAAAAAAAMhBAADIwQAAAAAAAMhBAABIwgAAAAAAAMhBAADIwQAAAAAAAMhBAABIwgAAAAAAAEhCAADIwQAAAAAAAEhCAABIwgAAAAAAAEhCAADIwQAAAAAAAEhCAABIwgAAAAAAAJZCAADIwQAAAAAAAJZCAABIwgAAAAAAAJZCAADIwQAAAAAAAJZCAABIwgAAAAAAAMhCAADIwQAAAAAAAMhCAADIwQAAAAAAAMjCAAAAAAAAAAAAAMjCAADIwQAAAAAAAJbCAAAAAAAAAAAAAJbCAADIwQAAAAAAAJbCAAAAAAAAAAAAAJbCAADIwQAAAAAAAEjCAAAAAAAAAAAAAEjCAADIwQAAAAAAAEjCAAAAAAAAAAAAAEjCAADIwQAAAAAAAMjBAAAAAAAAAAAAAMjBAADIwQAAAAAAAMjBAAAAAAAAAAAAAMjBAADIwQAAAAAAAAAAAAAAAAAAAAAAAAAAAADIwQAAAAAAAAAAAAAAAAAAAAAAAAAAAADIwQAAAAAAAMhBAAAAAAAAAAAAAMhBAADIwQAAAAAAAMhBAAAAAAAAAAAAAMhBAADIwQAAAAAAAEhCAAAAAAAAAAAAAEhCAADIwQAAAAAAAEhCAAAAAAAAAAAAAEhCAADIwQAAAAAAAJZCAAAAAAAAAAAAAJZCAADIwQAAAAAAAJZCAAAAAAAAAAAAAJZCAADIwQAAAAAAAMhCAAAAAAAAAAAAAMhCAAAAAAAAAAAAAMjCAADIQQAAAAAAAMjCAAAAAAAAAAAAAJbCAADIQQAAAAAAAJbCAAAAAAAAAAAAAJbCAADIQQAAAAAAAJbCAAAAAAAAAAAAAEjCAADIQQAAAAAAAEjCAAAAAAAAAAAAAEjCAADIQQAAAAAAAEjCAAAAAAAAAAAAAMjBAADIQQAAAAAAAMjBAAAAAAAAAAAAAMjBAADIQQAAAAAAAMjBAAAAAAAAAAAAAAAAAADIQQAAAAAAAAAAAAAAAAAAAAAAAAAAAADIQQAAAAAAAAAAAAAAAAAAAAAAAMhBAADIQQAAAAAAAMhBAAAAAAAAAAAAAMhBAADIQQAAAAAAAMhBAAAAAAAAAAAAAEhCAADIQQAAAAAAAEhCAAAAAAAAAAAAAEhCAADIQQAAAAAAAEhCAAAAAAAAAAAAAJZCAADIQQAAAAAAAJZCAAAAAAAAAAAAAJZCAADIQQAAAAAAAJZCAAAAAAAAAAAAAMhCAADIQQAAAAAAAMhCAADIQQAAAAAAAMjCAABIQgAAAAAAAMjCAADIQQAAAAAAAJbCAABIQgAAAAAAAJbCAADIQQAAAAAAAJbCAABIQgAAAAAAAJbCAADIQQAAAAAAAEjCAABIQgAAAAAAAEjCAADIQQAAAAAAAEjCAABIQgAAAAAAAEjCAADIQQAAAAAAAMjBAABIQgAAAAAAAMjBAADIQQAAAAAAAMjBAABIQgAAAAAAAMjBAADIQQAAAAAAAAAAAABIQgAAAAAAAAAAAADIQQAAAAAAAAAAAABIQgAAAAAAAAAAAADIQQAAAAAAAMhBAABIQgAAAAAAAMhBAADIQQAAAAAAAMhBAABIQgAAAAAAAMhBAADIQQAAAAAAAEhCAABIQgAAAAAAAEhCAADIQQAAAAAAAEhCAABIQgAAAAAAAEhCAADIQQAAAAAAAJZCAABIQgAAAAAAAJZCAADIQQAAAAAAAJZCAABIQgAAAAAAAJZCAADIQQAAAAAAAMhCAABIQgAAAAAAAMhCAABIQgAAAAAAAMjCAACWQgAAAAAAAMjCAABIQgAAAAAAAJbCAACWQgAAAAAAAJbCAABIQgAAAAAAAJbCAACWQgAAAAAAAJbCAABIQgAAAAAAAEjCAACWQgAAAAAAAEjCAABIQgAAAAAAAEjCAACWQgAAAAAAAEjCAABIQgAAAAAAAMjBAACWQgAAAAAAAMjBAABIQgAAAAAAAMjBAACWQgAAAAAAAMjBAABIQgAAAAAAAAAAAACWQgAAAAAAAAAAAABIQgAAAAAAAAAAAACWQgAAAAAAAAAAAABIQgAAAAAAAMhBAACWQgAAAAAAAMhBAABIQgAAAAAAAMhBAACWQgAAAAAAAMhBAABIQgAAAAAAAEhCAACWQgAAAAAAAEhCAABIQgAAAAAAAEhCAACWQgAAAAAAAEhCAABIQgAAAAAAAJZCAACWQgAAAAAAAJZCAABIQgAAAAAAAJZCAACWQgAAAAAAAJZCAABIQgAAAAAAAMhCAACWQgAAAAAAAMhCAACWQgAAAAAAAMjCAADIQgAAAAAAAMjCAACWQgAAAAAAAJbCAADIQgAAAAAAAJbCAACWQgAAAAAAAJbCAADIQgAAAAAAAJbCAACWQgAAAAAAAEjCAADIQgAAAAAAAEjCAACWQgAAAAAAAEjCAADIQgAAAAAAAEjCAACWQgAAAAAAAMjBAADIQgAAAAAAAMjBAACWQgAAAAAAAMjBAADIQgAAAAAAAMjBAACWQgAAAAAAAAAAAADIQgAAAAAAAAAAAACWQgAAAAAAAAAAAADIQgAAAAAAAAAAAACWQgAAAAAAAMhBAADIQgAAAAAAAMhBAACWQgAAAAAAAMhBAADIQgAAAAAAAMhBAACWQgAAAAAAAEhCAADIQgAAAAAAAEhCAACWQgAAAAAAAEhCAADIQgAAAAAAAEhCAACWQgAAAAAAAJZCAADIQgAAAAAAAJZCAACWQgAAAAAAAJZCAADIQgAAAAAAAJZCAACWQgAAAAAAAMhCAADIQgAAAAAAAMhC"}]}]}, {"py/reduce": [{"py/function": "numpy._core.multiarray._reconstruct"}, {"py/tuple": [{"py/type": "numpy.ndarray"}, {"py/tuple": [0]}, {"py/b64": "Yg=="}]}, {"py/tuple": [1, {"py/tuple": [256, 2]}, {"py/id": 3}, false, {"py/b64": "AAAAAAAAAAAAAAA+AAAAAAAAAAAAAAA+AAAAPgAAAD4AAAAAAAAAPgAAAD4AAAA+AAAAAAAAgD4AAAA+AACAPgAAAAAAAIA+AAAAPgAAgD4AAAAAAADAPgAAAD4AAMA+AAAAAAAAwD4AAAA+AADAPgAAAAAAAAA/AAAAPgAAAD8AAAAAAAAAPwAAAD4AAAA/AAAAAAAAID8AAAA+AAAgPwAAAAAAACA/AAAAPgAAID8AAAAAAABAPwAAAD4AAEA/AAAAAAAAQD8AAAA+AABAPwAAAAAAAGA/AAAAPgAAYD8AAAAAAABgPwAAAD4AAGA/AAAAAAAAgD8AAAA+AACAPwAAAD4AAAAAAACAPgAAAAAAAAA+AAAAPgAAgD4AAAA+AAAAPgAAAD4AAIA+AAAAPgAAAD4AAIA+AACAPgAAgD4AAAA+AACAPgAAgD4AAIA+AAAAPgAAwD4AAIA+AADAPgAAAD4AAMA+AACAPgAAwD4AAAA+AAAAPwAAgD4AAAA/AAAAPgAAAD8AAIA+AAAAPwAAAD4AACA/AACAPgAAID8AAAA+AAAgPwAAgD4AACA/AAAAPgAAQD8AAIA+AABAPwAAAD4AAEA/AACAPgAAQD8AAAA+AABgPwAAgD4AAGA/AAAAPgAAYD8AAIA+AABgPwAAAD4AAIA/AACAPgAAgD8AAIA+AAAAAAAAwD4AAAAAAACAPgAAAD4AAMA+AAAAPgAAgD4AAAA+AADAPgAAAD4AAIA+AACAPgAAwD4AAIA+AACAPgAAgD4AAMA+AACAPgAAgD4AAMA+AADAPgAAwD4AAIA+AADAPgAAwD4AAMA+AACAPgAAAD8AAMA+AAAAPwAAgD4AAAA/AADAPgAAAD8AAIA+AAAgPwAAwD4AACA/AACAPgAAID8AAMA+AAAgPwAAgD4AAEA/AADAPgAAQD8AAIA+AABAPwAAwD4AAEA/AACAPgAAYD8AAMA+AABgPwAAgD4AAGA/AADAPgAAYD8AAIA+AACAPwAAwD4AAIA/AADAPgAAAAAAAAA/AAAAAAAAwD4AAAA+AAAAPwAAAD4AAMA+AAAAPgAAAD8AAAA+AADAPgAAgD4AAAA/AACAPgAAwD4AAIA+AAAAPwAAgD4AAMA+AADAPgAAAD8AAMA+AADAPgAAwD4AAAA/AADAPgAAwD4AAAA/AAAAPwAAAD8AAMA+AAAAPwAAAD8AAAA/AADAPgAAID8AAAA/AAAgPwAAwD4AACA/AAAAPwAAID8AAMA+AABAPwAAAD8AAEA/AADAPgAAQD8AAAA/AABAPwAAwD4AAGA/AAAAPwAAYD8AAMA+AABgPwAAAD8AAGA/AADAPgAAgD8AAAA/AACAPwAAAD8AAAAAAAAgPwAAAAAAAAA/AAAAPgAAID8AAAA+AAAAPwAAAD4AACA/AAAAPgAAAD8AAIA+AAAgPwAAgD4AAAA/AACAPgAAID8AAIA+AAAAPwAAwD4AACA/AADAPgAAAD8AAMA+AAAgPwAAwD4AAAA/AAAAPwAAID8AAAA/AAAAPwAAAD8AACA/AAAAPwAAAD8AACA/AAAgPwAAID8AAAA/AAAgPwAAID8AACA/AAAAPwAAQD8AACA/AABAPwAAAD8AAEA/AAAgPwAAQD8AAAA/AABgPwAAID8AAGA/AAAAPwAAYD8AACA/AABgPwAAAD8AAIA/AAAgPwAAgD8AACA/AAAAAAAAQD8AAAAAAAAgPwAAAD4AAEA/AAAAPgAAID8AAAA+AABAPwAAAD4AACA/AACAPgAAQD8AAIA+AAAgPwAAgD4AAEA/AACAPgAAID8AAMA+AABAPwAAwD4AACA/AADAPgAAQD8AAMA+AAAgPwAAAD8AAEA/AAAAPwAAID8AAAA/AABAPwAAAD8AACA/AAAgPwAAQD8AACA/AAAgPwAAID8AAEA/AAAgPwAAID8AAEA/AABAPwAAQD8AACA/AABAPwAAQD8AAEA/AAAgPwAAYD8AAEA/AABgPwAAID8AAGA/AABAPwAAYD8AACA/AACAPwAAQD8AAIA/AABAPwAAAAAAAGA/AAAAAAAAQD8AAAA+AABgPwAAAD4AAEA/AAAAPgAAYD8AAAA+AABAPwAAgD4AAGA/AACAPgAAQD8AAIA+AABgPwAAgD4AAEA/AADAPgAAYD8AAMA+AABAPwAAwD4AAGA/AADAPgAAQD8AAAA/AABgPwAAAD8AAEA/AAAAPwAAYD8AAAA/AABAPwAAID8AAGA/AAAgPwAAQD8AACA/AABgPwAAID8AAEA/AABAPwAAYD8AAEA/AABAPwAAQD8AAGA/AABAPwAAQD8AAGA/AABgPwAAYD8AAEA/AABgPwAAYD8AAGA/AABAPwAAgD8AAGA/AACAPwAAYD8AAAAAAACAPwAAAAAAAGA/AAAAPgAAgD8AAAA+AABgPwAAAD4AAIA/AAAAPgAAYD8AAIA+AACAPwAAgD4AAGA/AACAPgAAgD8AAIA+AABgPwAAwD4AAIA/AADAPgAAYD8AAMA+AACAPwAAwD4AAGA/AAAAPwAAgD8AAAA/AABgPwAAAD8AAIA/AAAAPwAAYD8AACA/AACAPwAAID8AAGA/AAAgPwAAgD8AACA/AABgPwAAQD8AAIA/AABAPwAAYD8AAEA/AACAPwAAQD8AAGA/AABgPwAAgD8AAGA/AABgPwAAYD8AAIA/AABgPwAAYD8AAIA/AACAPwAAgD8="}]}]}], "indices": null, "render_pipeline": {"py/reduce": [{"py/function": "numpy._core.multiarray.scalar"}, {"py/tuple": [{"py/reduce": [{"py/type": "numpy.dtype"}, {"py/tuple": ["u4", false, true]}, {"py/tuple": [3, "<", null, null, null, -1, -1, 0]}]}, {"py/b64": "AwAAAA=="}]}]}, "buffers": [{"py/reduce": [{"py/function": "numpy._core.multiarray.scalar"}, {"py/tuple": [{"py/id": 6}, {"py/b64": "BgAAAA=="}]}]}, {"py/reduce": [{"py/function": "numpy._core.multiarray.scalar"}, {"py/tuple": [{"py/id": 6}, {"py/b64": "BwAAAA=="}]}]}], "index_buffer": null, "changed": false, "batch": 0, "load_from_file": false, "hash": {"py/object": "uuid.UUID", "hex": "9af02eaa4e6e496b82a9b9bcbd725499"}}'
+        }
+
+        def "MaterialComponent"
+        {
+            custom string dict = '{"py/object": "pyGandalf.scene.components.MaterialComponent", "name": "M_Terrain", "instance": {"py/object": "pyGandalf.utilities.opengl_material_lib.MaterialInstance", "name": "M_Terrain", "data": {"py/object": "pyGandalf.utilities.opengl_material_lib.MaterialData", "base_template": "default_tessellation", "color": {"py/object": "glm.vec4", "py/state": {"py/tuple": [1.0, 1.0, 1.0, 1.0]}}, "textures": ["grassAlbedo", "snowAlbedo", "sandAlbedo", "grassNormal", "snowNormal", "sandNormal", "grassMask", "snowMask", "sandMask", "rockAlbedo", "rockNormal", "rockMask", "heightmap"], "glossiness": 3.0, "scale": 200, "elevationScale": 25, "mapSize": 64.0, "cameraCoords": {"py/object": "glm.vec2", "py/state": {"py/tuple": [-112.2751693725586, 35.86029052734375]}}, "metallic": 0.0, "roughness": 0.6, "ao": 1.0, "heightOfBlend": 0.6, "depthOfBlend": 1.05, "maxHeight": 60.0, "heightOfSnow": 0.9, "heightOfGrass": 0.03, "rockColor": {"py/object": "glm.vec4", "py/state": {"py/tuple": [0.33000001311302185, 0.33000001311302185, 0.33000001311302185, 1.0]}}, "rockBlendAmount": 1.14, "slopeTreshold": 0.5, "snowColor": {"py/object": "glm.vec4", "py/state": {"py/tuple": [0.9300000071525574, 0.8299999833106995, 0.8299999833106995, 1.0]}}, "grassColor": {"py/object": "glm.vec4", "py/state": {"py/tuple": [0.25999999046325684, 0.4399999976158142, 0.20000000298023224, 1.0]}}, "sandColor": {"py/object": "glm.vec4", "py/state": {"py/tuple": [1.0, 0.699999988079071, 0.5400000214576721, 1.0]}}, "tiling": {"py/object": "glm.ivec2", "py/state": {"py/tuple": [10, 10]}}, "useTextures": false}, "descriptor": {"py/object": "pyGandalf.utilities.opengl_material_lib.MaterialDescriptor", "primitive": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_PATCHES", 14]}, "py/state": "GL_PATCHES"}, "cull_enabled": true, "cull_face": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_FRONT", 1028]}, "py/state": "GL_FRONT"}, "patch_resolution": 8, "vertices_per_patch": 4, "depth_enabled": true, "depth_func": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LEQUAL", 515]}, "py/state": "GL_LEQUAL"}, "depth_mask": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_TRUE", 1]}, "py/state": "GL_TRUE"}, "blend_enabled": true, "blend_func_source": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_SRC_ALPHA", 770]}, "py/state": "GL_SRC_ALPHA"}, "blend_func_destination": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_ONE_MINUS_SRC_ALPHA", 771]}, "py/state": "GL_ONE_MINUS_SRC_ALPHA"}, "blend_equation": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_FUNC_ADD", 32774]}, "py/state": "GL_FUNC_ADD"}}, "isMeshShader": false, "shader_program": 5, "shader_params": {"cameraCoords": "vec2", "grassAlbedo": "sampler2D", "snowAlbedo": "sampler2D", "sandAlbedo": "sampler2D", "grassNormal": "sampler2D", "snowNormal": "sampler2D", "sandNormal": "sampler2D", "grassMask": "sampler2D", "snowMask": "sampler2D", "sandMask": "sampler2D", "rockAlbedo": "sampler2D", "rockNormal": "sampler2D", "rockMask": "sampler2D", "tiling": "ivec2", "useTextures": "int", "u_ViewPosition": "vec3", "u_Color": "vec3", "metallic": "float", "roughness": "float", "ao": "float", "u_LightCount": "int", "u_LightIntensities": "float[16]", "u_LightPositions": "vec3[16]", "u_LightColors": "vec3[16]", "_Height_of_blend": "float", "_Depth": "float", "maxHeight": "float", "heightOfSnow": "float", "heightOfGrass": "float", "rockColor": "vec4", "rockBlendAmount": "float", "slopeTreshold": "float", "snowColor": "vec4", "grassColor": "vec4", "sandColor": "vec4", "mapSize": "int", "u_Model": "mat4", "u_View": "mat4", "u_Projection": "mat4", "scale": "int", "elevationScale": "int", "imgOutput": "sampler2D"}}}'
+        }
+
+        def "TerrainComponent"
+        {
+            custom string dict = '{"py/object": "pyGandalf.scene.components.TerrainComponent", "minHeight": 0.0, "maxHeight": 0.0, "scale": 200, "elevationScale": 25, "mapSize": 512, "patch_resolution": 8, "vertices_per_patch": 4, "cameraCoords": {"py/object": "glm.vec2", "py/state": {"py/tuple": [-112.2751693725586, 35.86029052734375]}}, "camera": {"py/object": "pyGandalf.scene.entity.Entity", "id": {"py/object": "uuid.UUID", "hex": "0ffc0070199e44e6b82b1ce974bc5b9d"}, "enabled": true}, "generate": false, "cameraMoved": false, "minTerrainHeight": [], "maxTerrainHeight": [], "heightMap": [], "heights": [], "vertices": {"py/reduce": [{"py/function": "numpy._core.multiarray._reconstruct"}, {"py/tuple": [{"py/type": "numpy.ndarray"}, {"py/tuple": [0]}, {"py/b64": "Yg=="}]}, {"py/tuple": [1, {"py/tuple": [256, 3]}, {"py/reduce": [{"py/type": "numpy.dtype"}, {"py/tuple": ["f4", false, true]}, {"py/tuple": [3, "<", null, null, null, -1, -1, 0]}]}, false, {"py/b64": "AADIwgAAAAAAAMjCAACWwgAAAAAAAMjCAADIwgAAAAAAAJbCAACWwgAAAAAAAJbCAADIwgAAAAAAAJbCAACWwgAAAAAAAJbCAADIwgAAAAAAAEjCAACWwgAAAAAAAEjCAADIwgAAAAAAAEjCAACWwgAAAAAAAEjCAADIwgAAAAAAAMjBAACWwgAAAAAAAMjBAADIwgAAAAAAAMjBAACWwgAAAAAAAMjBAADIwgAAAAAAAAAAAACWwgAAAAAAAAAAAADIwgAAAAAAAAAAAACWwgAAAAAAAAAAAADIwgAAAAAAAMhBAACWwgAAAAAAAMhBAADIwgAAAAAAAMhBAACWwgAAAAAAAMhBAADIwgAAAAAAAEhCAACWwgAAAAAAAEhCAADIwgAAAAAAAEhCAACWwgAAAAAAAEhCAADIwgAAAAAAAJZCAACWwgAAAAAAAJZCAADIwgAAAAAAAJZCAACWwgAAAAAAAJZCAADIwgAAAAAAAMhCAACWwgAAAAAAAMhCAACWwgAAAAAAAMjCAABIwgAAAAAAAMjCAACWwgAAAAAAAJbCAABIwgAAAAAAAJbCAACWwgAAAAAAAJbCAABIwgAAAAAAAJbCAACWwgAAAAAAAEjCAABIwgAAAAAAAEjCAACWwgAAAAAAAEjCAABIwgAAAAAAAEjCAACWwgAAAAAAAMjBAABIwgAAAAAAAMjBAACWwgAAAAAAAMjBAABIwgAAAAAAAMjBAACWwgAAAAAAAAAAAABIwgAAAAAAAAAAAACWwgAAAAAAAAAAAABIwgAAAAAAAAAAAACWwgAAAAAAAMhBAABIwgAAAAAAAMhBAACWwgAAAAAAAMhBAABIwgAAAAAAAMhBAACWwgAAAAAAAEhCAABIwgAAAAAAAEhCAACWwgAAAAAAAEhCAABIwgAAAAAAAEhCAACWwgAAAAAAAJZCAABIwgAAAAAAAJZCAACWwgAAAAAAAJZCAABIwgAAAAAAAJZCAACWwgAAAAAAAMhCAABIwgAAAAAAAMhCAABIwgAAAAAAAMjCAADIwQAAAAAAAMjCAABIwgAAAAAAAJbCAADIwQAAAAAAAJbCAABIwgAAAAAAAJbCAADIwQAAAAAAAJbCAABIwgAAAAAAAEjCAADIwQAAAAAAAEjCAABIwgAAAAAAAEjCAADIwQAAAAAAAEjCAABIwgAAAAAAAMjBAADIwQAAAAAAAMjBAABIwgAAAAAAAMjBAADIwQAAAAAAAMjBAABIwgAAAAAAAAAAAADIwQAAAAAAAAAAAABIwgAAAAAAAAAAAADIwQAAAAAAAAAAAABIwgAAAAAAAMhBAADIwQAAAAAAAMhBAABIwgAAAAAAAMhBAADIwQAAAAAAAMhBAABIwgAAAAAAAEhCAADIwQAAAAAAAEhCAABIwgAAAAAAAEhCAADIwQAAAAAAAEhCAABIwgAAAAAAAJZCAADIwQAAAAAAAJZCAABIwgAAAAAAAJZCAADIwQAAAAAAAJZCAABIwgAAAAAAAMhCAADIwQAAAAAAAMhCAADIwQAAAAAAAMjCAAAAAAAAAAAAAMjCAADIwQAAAAAAAJbCAAAAAAAAAAAAAJbCAADIwQAAAAAAAJbCAAAAAAAAAAAAAJbCAADIwQAAAAAAAEjCAAAAAAAAAAAAAEjCAADIwQAAAAAAAEjCAAAAAAAAAAAAAEjCAADIwQAAAAAAAMjBAAAAAAAAAAAAAMjBAADIwQAAAAAAAMjBAAAAAAAAAAAAAMjBAADIwQAAAAAAAAAAAAAAAAAAAAAAAAAAAADIwQAAAAAAAAAAAAAAAAAAAAAAAAAAAADIwQAAAAAAAMhBAAAAAAAAAAAAAMhBAADIwQAAAAAAAMhBAAAAAAAAAAAAAMhBAADIwQAAAAAAAEhCAAAAAAAAAAAAAEhCAADIwQAAAAAAAEhCAAAAAAAAAAAAAEhCAADIwQAAAAAAAJZCAAAAAAAAAAAAAJZCAADIwQAAAAAAAJZCAAAAAAAAAAAAAJZCAADIwQAAAAAAAMhCAAAAAAAAAAAAAMhCAAAAAAAAAAAAAMjCAADIQQAAAAAAAMjCAAAAAAAAAAAAAJbCAADIQQAAAAAAAJbCAAAAAAAAAAAAAJbCAADIQQAAAAAAAJbCAAAAAAAAAAAAAEjCAADIQQAAAAAAAEjCAAAAAAAAAAAAAEjCAADIQQAAAAAAAEjCAAAAAAAAAAAAAMjBAADIQQAAAAAAAMjBAAAAAAAAAAAAAMjBAADIQQAAAAAAAMjBAAAAAAAAAAAAAAAAAADIQQAAAAAAAAAAAAAAAAAAAAAAAAAAAADIQQAAAAAAAAAAAAAAAAAAAAAAAMhBAADIQQAAAAAAAMhBAAAAAAAAAAAAAMhBAADIQQAAAAAAAMhBAAAAAAAAAAAAAEhCAADIQQAAAAAAAEhCAAAAAAAAAAAAAEhCAADIQQAAAAAAAEhCAAAAAAAAAAAAAJZCAADIQQAAAAAAAJZCAAAAAAAAAAAAAJZCAADIQQAAAAAAAJZCAAAAAAAAAAAAAMhCAADIQQAAAAAAAMhCAADIQQAAAAAAAMjCAABIQgAAAAAAAMjCAADIQQAAAAAAAJbCAABIQgAAAAAAAJbCAADIQQAAAAAAAJbCAABIQgAAAAAAAJbCAADIQQAAAAAAAEjCAABIQgAAAAAAAEjCAADIQQAAAAAAAEjCAABIQgAAAAAAAEjCAADIQQAAAAAAAMjBAABIQgAAAAAAAMjBAADIQQAAAAAAAMjBAABIQgAAAAAAAMjBAADIQQAAAAAAAAAAAABIQgAAAAAAAAAAAADIQQAAAAAAAAAAAABIQgAAAAAAAAAAAADIQQAAAAAAAMhBAABIQgAAAAAAAMhBAADIQQAAAAAAAMhBAABIQgAAAAAAAMhBAADIQQAAAAAAAEhCAABIQgAAAAAAAEhCAADIQQAAAAAAAEhCAABIQgAAAAAAAEhCAADIQQAAAAAAAJZCAABIQgAAAAAAAJZCAADIQQAAAAAAAJZCAABIQgAAAAAAAJZCAADIQQAAAAAAAMhCAABIQgAAAAAAAMhCAABIQgAAAAAAAMjCAACWQgAAAAAAAMjCAABIQgAAAAAAAJbCAACWQgAAAAAAAJbCAABIQgAAAAAAAJbCAACWQgAAAAAAAJbCAABIQgAAAAAAAEjCAACWQgAAAAAAAEjCAABIQgAAAAAAAEjCAACWQgAAAAAAAEjCAABIQgAAAAAAAMjBAACWQgAAAAAAAMjBAABIQgAAAAAAAMjBAACWQgAAAAAAAMjBAABIQgAAAAAAAAAAAACWQgAAAAAAAAAAAABIQgAAAAAAAAAAAACWQgAAAAAAAAAAAABIQgAAAAAAAMhBAACWQgAAAAAAAMhBAABIQgAAAAAAAMhBAACWQgAAAAAAAMhBAABIQgAAAAAAAEhCAACWQgAAAAAAAEhCAABIQgAAAAAAAEhCAACWQgAAAAAAAEhCAABIQgAAAAAAAJZCAACWQgAAAAAAAJZCAABIQgAAAAAAAJZCAACWQgAAAAAAAJZCAABIQgAAAAAAAMhCAACWQgAAAAAAAMhCAACWQgAAAAAAAMjCAADIQgAAAAAAAMjCAACWQgAAAAAAAJbCAADIQgAAAAAAAJbCAACWQgAAAAAAAJbCAADIQgAAAAAAAJbCAACWQgAAAAAAAEjCAADIQgAAAAAAAEjCAACWQgAAAAAAAEjCAADIQgAAAAAAAEjCAACWQgAAAAAAAMjBAADIQgAAAAAAAMjBAACWQgAAAAAAAMjBAADIQgAAAAAAAMjBAACWQgAAAAAAAAAAAADIQgAAAAAAAAAAAACWQgAAAAAAAAAAAADIQgAAAAAAAAAAAACWQgAAAAAAAMhBAADIQgAAAAAAAMhBAACWQgAAAAAAAMhBAADIQgAAAAAAAMhBAACWQgAAAAAAAEhCAADIQgAAAAAAAEhCAACWQgAAAAAAAEhCAADIQgAAAAAAAEhCAACWQgAAAAAAAJZCAADIQgAAAAAAAJZCAACWQgAAAAAAAJZCAADIQgAAAAAAAJZCAACWQgAAAAAAAMhCAADIQgAAAAAAAMhC"}]}]}, "indices": []}'
+        }
+
+        def "ComputeComponent"
+        {
+            custom string dict = '{"py/object": "pyGandalf.scene.components.ComputeComponent", "shader": {"py/reduce": [{"py/type": "pathlib.WindowsPath"}, {"py/tuple": ["c:\\\\", "users", "oarka", "desktop", "pygandalf", "pygandalf", "pyGandalf", "resources", "shaders", "opengl", "heightmap.compute"]}]}, "textures": [{"py/reduce": [{"py/function": "numpy._core.multiarray.scalar"}, {"py/tuple": [{"py/reduce": [{"py/type": "numpy.dtype"}, {"py/tuple": ["u4", false, true]}, {"py/tuple": [3, "<", null, null, null, -1, -1, 0]}]}, {"py/b64": "DwAAAA=="}]}]}], "dispatch": false, "ID": 10, "uniformsDictionary": {"imgOutput": "image2D", "scale": "int", "frequency": "float", "lacunarity": "float", "persistence": "float", "octaves": "int", "turbulance": "int", "Ridges": "int", "ridgesStrength": "int", "seed": "int", "fallOffEnabled": "int", "fallOffType": "int", "fallOffHeight": "float", "a": "float", "b": "float", "underWaterRavines": "int", "cameraCoords": "vec2", "mapSize": "int", "clampHeight": "int", "minHeight": "float", "maxHeight": "float"}, "uniformsData": [0, 200, 0.2, 2.0, 0.5, 12, false, false, 1, 33, 0, 0, 0.2, 2.2, 0.4, 0, {"py/object": "glm.vec2", "py/state": {"py/tuple": [-112.2751693725586, 35.86029052734375]}}, 512, true, -0.9800000190734863, 1.2400000095367432], "guiData": {"turbulance": {"py/object": "pyGandalf.scene.components.GUIData", "speed": 0, "min": 0, "max": 0, "type": {"py/reduce": [{"py/type": "pyGandalf.scene.components.GUIType"}, {"py/tuple": [2]}]}, "comboValues": ["", ""], "hidden": false}, "fallOffEnabled": {"py/object": "pyGandalf.scene.components.GUIData", "speed": 0, "min": 0, "max": 0, "type": {"py/id": 10}, "comboValues": {"py/id": 11}, "hidden": false}, "Ridges": {"py/object": "pyGandalf.scene.components.GUIData", "speed": 0, "min": 0, "max": 0, "type": {"py/id": 10}, "comboValues": {"py/id": 11}, "hidden": false}, "fallOffType": {"py/object": "pyGandalf.scene.components.GUIData", "speed": 0, "min": 0, "max": 0, "type": {"py/reduce": [{"py/type": "pyGandalf.scene.components.GUIType"}, {"py/tuple": [3]}]}, "comboValues": ["Circle", "Rectangle"], "hidden": false}, "underWaterRavines": {"py/object": "pyGandalf.scene.components.GUIData", "speed": 0, "min": 0, "max": 0, "type": {"py/id": 10}, "comboValues": {"py/id": 11}, "hidden": false}, "mapSize": {"py/object": "pyGandalf.scene.components.GUIData", "speed": 0, "min": 0, "max": 0, "type": {"py/reduce": [{"py/type": "pyGandalf.scene.components.GUIType"}, {"py/tuple": [0]}]}, "comboValues": {"py/id": 11}, "hidden": true}, "clampHeight": {"py/object": "pyGandalf.scene.components.GUIData", "speed": 0, "min": 0, "max": 0, "type": {"py/id": 10}, "comboValues": {"py/id": 11}, "hidden": false}, "minHeight": {"py/object": "pyGandalf.scene.components.GUIData", "speed": 0, "min": -2.0, "max": 100.0, "type": {"py/id": 19}, "comboValues": {"py/id": 11}, "hidden": false}, "imgOutput": {"py/object": "pyGandalf.scene.components.GUIData", "speed": 1, "min": 0, "max": 1000, "type": {"py/id": 19}, "comboValues": {"py/id": 11}, "hidden": false}, "scale": {"py/object": "pyGandalf.scene.components.GUIData", "speed": 1, "min": 0, "max": 1000, "type": {"py/id": 19}, "comboValues": {"py/id": 11}, "hidden": false}, "frequency": {"py/object": "pyGandalf.scene.components.GUIData", "speed": 0.01, "min": 0.0, "max": 100.0, "type": {"py/id": 19}, "comboValues": {"py/id": 11}, "hidden": false}, "lacunarity": {"py/object": "pyGandalf.scene.components.GUIData", "speed": 0.01, "min": 0.0, "max": 100.0, "type": {"py/id": 19}, "comboValues": {"py/id": 11}, "hidden": false}, "persistence": {"py/object": "pyGandalf.scene.components.GUIData", "speed": 0.01, "min": 0.0, "max": 100.0, "type": {"py/id": 19}, "comboValues": {"py/id": 11}, "hidden": false}, "octaves": {"py/object": "pyGandalf.scene.components.GUIData", "speed": 1, "min": 0, "max": 1000, "type": {"py/id": 19}, "comboValues": {"py/id": 11}, "hidden": false}, "ridgesStrength": {"py/object": "pyGandalf.scene.components.GUIData", "speed": 1, "min": 0, "max": 1000, "type": {"py/id": 19}, "comboValues": {"py/id": 11}, "hidden": false}, "seed": {"py/object": "pyGandalf.scene.components.GUIData", "speed": 1, "min": 0, "max": 1000, "type": {"py/id": 19}, "comboValues": {"py/id": 11}, "hidden": false}, "fallOffHeight": {"py/object": "pyGandalf.scene.components.GUIData", "speed": 0.01, "min": 0.0, "max": 100.0, "type": {"py/id": 19}, "comboValues": {"py/id": 11}, "hidden": false}, "a": {"py/object": "pyGandalf.scene.components.GUIData", "speed": 0.01, "min": 0.0, "max": 100.0, "type": {"py/id": 19}, "comboValues": {"py/id": 11}, "hidden": false}, "b": {"py/object": "pyGandalf.scene.components.GUIData", "speed": 0.01, "min": 0.0, "max": 100.0, "type": {"py/id": 19}, "comboValues": {"py/id": 11}, "hidden": false}, "cameraCoords": {"py/object": "pyGandalf.scene.components.GUIData", "speed": 1, "min": 0, "max": 1000, "type": {"py/id": 19}, "comboValues": {"py/id": 11}, "hidden": false}, "maxHeight": {"py/object": "pyGandalf.scene.components.GUIData", "speed": 0.01, "min": 0.0, "max": 100.0, "type": {"py/id": 19}, "comboValues": {"py/id": 11}, "hidden": false}}, "workGroupsX": 512, "workGroupsY": 512, "workGroupsZ": 1}'
+        }
+    }
+
+    def "Entity47b0a9789212407a88841ce15894e273"
+    {
+        custom bool enabled = 1
+        custom string id = "47b0a9789212407a88841ce15894e273"
+
+        def "InfoComponent"
+        {
+            custom string dict = '{"py/object": "pyGandalf.scene.components.InfoComponent", "tag": "light", "enabled": true}'
+        }
+
+        def "TransformComponent"
+        {
+            custom string dict = '{"py/object": "pyGandalf.scene.components.TransformComponent", "translation": {"py/object": "glm.vec3", "py/state": {"py/tuple": [0.0, 50.0, 2.0]}}, "rotation": {"py/object": "glm.vec3", "py/state": {"py/tuple": [0.0, 0.0, 0.0]}}, "scale": {"py/object": "glm.vec3", "py/state": {"py/tuple": [1.0, 1.0, 1.0]}}, "local_matrix": {"py/object": "glm.mat4x4", "py/state": {"py/tuple": [{"py/tuple": [1.0, 0.0, 0.0, 0.0]}, {"py/tuple": [0.0, 1.0, 0.0, 0.0]}, {"py/tuple": [0.0, 0.0, 1.0, 0.0]}, {"py/tuple": [0.0, 50.0, 2.0, 1.0]}]}}, "world_matrix": {"py/object": "glm.mat4x4", "py/state": {"py/tuple": [{"py/tuple": [1.0, 0.0, 0.0, 0.0]}, {"py/tuple": [0.0, 1.0, 0.0, 0.0]}, {"py/tuple": [0.0, 0.0, 1.0, 0.0]}, {"py/tuple": [0.0, 50.0, 2.0, 1.0]}]}}, "quaternion": {"py/object": "glm.quat", "py/state": {"py/tuple": [1.0, 0.0, 0.0, 0.0]}}, "dirty": false, "static": false}'
+        }
+
+        def "LinkComponent"
+        {
+            custom string dict = '{"py/object": "pyGandalf.scene.components.LinkComponent", "parent_id": {"py/object": "uuid.UUID", "hex": "5216513b1ca44322a07286006099b7c5"}, "parent": {"py/object": "pyGandalf.scene.entity.Entity", "id": {"py/id": 1}, "enabled": true}, "prev_parent": {"py/id": 2}, "children": []}'
+        }
+
+        def "LightComponent"
+        {
+            custom string dict = '{"py/object": "pyGandalf.scene.components.LightComponent", "color": {"py/object": "glm.vec3", "py/state": {"py/tuple": [1.0, 1.0, 1.0]}}, "intensity": 15000.0}'
+        }
+    }
+
+    def "Entity969b2085ec4648c3bf2ba4a59049a024"
+    {
+        custom bool enabled = 1
+        custom string id = "969b2085ec4648c3bf2ba4a59049a024"
+
+        def "InfoComponent"
+        {
+            custom string dict = '{"py/object": "pyGandalf.scene.components.InfoComponent", "tag": "cloudy_skybox", "enabled": true}'
+        }
+
+        def "TransformComponent"
+        {
+            custom string dict = '{"py/object": "pyGandalf.scene.components.TransformComponent", "translation": {"py/object": "glm.vec3", "py/state": {"py/tuple": [0.0, 0.0, 0.0]}}, "rotation": {"py/object": "glm.vec3", "py/state": {"py/tuple": [0.0, 0.0, 0.0]}}, "scale": {"py/object": "glm.vec3", "py/state": {"py/tuple": [1.0, 1.0, 1.0]}}, "local_matrix": {"py/object": "glm.mat4x4", "py/state": {"py/tuple": [{"py/tuple": [1.0, 0.0, 0.0, 0.0]}, {"py/tuple": [0.0, 1.0, 0.0, 0.0]}, {"py/tuple": [0.0, 0.0, 1.0, 0.0]}, {"py/tuple": [0.0, 0.0, 0.0, 1.0]}]}}, "world_matrix": {"py/object": "glm.mat4x4", "py/state": {"py/tuple": [{"py/tuple": [1.0, 0.0, 0.0, 0.0]}, {"py/tuple": [0.0, 1.0, 0.0, 0.0]}, {"py/tuple": [0.0, 0.0, 1.0, 0.0]}, {"py/tuple": [0.0, 0.0, 0.0, 1.0]}]}}, "quaternion": {"py/object": "glm.quat", "py/state": {"py/tuple": [1.0, 0.0, 0.0, 0.0]}}, "dirty": false, "static": false}'
+        }
+
+        def "LinkComponent"
+        {
+            custom string dict = '{"py/object": "pyGandalf.scene.components.LinkComponent", "parent_id": 0, "parent": null, "prev_parent": null, "children": []}'
+        }
+
+        def "StaticMeshComponent"
+        {
+            custom string dict = '{"py/object": "pyGandalf.scene.components.StaticMeshComponent", "name": "skybox", "attributes": [{"py/reduce": [{"py/function": "numpy._core.multiarray._reconstruct"}, {"py/tuple": [{"py/type": "numpy.ndarray"}, {"py/tuple": [0]}, {"py/b64": "Yg=="}]}, {"py/tuple": [1, {"py/tuple": [36, 3]}, {"py/reduce": [{"py/type": "numpy.dtype"}, {"py/tuple": ["f4", false, true]}, {"py/tuple": [3, "<", null, null, null, -1, -1, 0]}]}, false, {"py/b64": "AACAvwAAgL8AAIC/AACAvwAAgL8AAIA/AACAvwAAgD8AAIA/AACAPwAAgD8AAIC/AACAvwAAgL8AAIC/AACAvwAAgD8AAIC/AACAPwAAgL8AAIA/AACAvwAAgL8AAIC/AACAPwAAgL8AAIC/AACAPwAAgD8AAIC/AACAPwAAgL8AAIC/AACAvwAAgL8AAIC/AACAvwAAgL8AAIC/AACAvwAAgD8AAIA/AACAvwAAgD8AAIC/AACAPwAAgL8AAIA/AACAvwAAgL8AAIA/AACAvwAAgL8AAIC/AACAvwAAgD8AAIA/AACAvwAAgL8AAIA/AACAPwAAgL8AAIA/AACAPwAAgD8AAIA/AACAPwAAgL8AAIC/AACAPwAAgD8AAIC/AACAPwAAgL8AAIC/AACAPwAAgD8AAIA/AACAPwAAgL8AAIA/AACAPwAAgD8AAIA/AACAPwAAgD8AAIC/AACAvwAAgD8AAIC/AACAPwAAgD8AAIA/AACAvwAAgD8AAIC/AACAvwAAgD8AAIA/AACAPwAAgD8AAIA/AACAvwAAgD8AAIA/AACAPwAAgL8AAIA/"}]}]}], "indices": null, "render_pipeline": {"py/reduce": [{"py/function": "numpy._core.multiarray.scalar"}, {"py/tuple": [{"py/reduce": [{"py/type": "numpy.dtype"}, {"py/tuple": ["u4", false, true]}, {"py/tuple": [3, "<", null, null, null, -1, -1, 0]}]}, {"py/b64": "AgAAAA=="}]}]}, "buffers": [{"py/reduce": [{"py/function": "numpy._core.multiarray.scalar"}, {"py/tuple": [{"py/id": 5}, {"py/b64": "AwAAAA=="}]}]}], "index_buffer": null, "changed": false, "batch": 0, "load_from_file": false, "hash": {"py/object": "uuid.UUID", "hex": "3b5665c7341542f2b77654367b297c43"}}'
+        }
+
+        def "MaterialComponent"
+        {
+            custom string dict = '{"py/object": "pyGandalf.scene.components.MaterialComponent", "name": "M_CloudySkybox", "instance": {"py/object": "pyGandalf.utilities.opengl_material_lib.MaterialInstance", "name": "M_CloudySkybox", "data": {"py/object": "pyGandalf.utilities.opengl_material_lib.MaterialData", "base_template": "skybox", "color": {"py/object": "glm.vec4", "py/state": {"py/tuple": [1.0, 1.0, 1.0, 1.0]}}, "textures": ["cloudy_cube_map"], "glossiness": 3.0, "scale": 200, "elevationScale": 10.0, "mapSize": 2, "cameraCoords": {"py/object": "glm.vec2", "py/state": {"py/tuple": [0.0, 0.0]}}, "metallic": 0.0, "roughness": 0.6, "ao": 1.0, "heightOfBlend": 0.6, "depthOfBlend": 1.05, "maxHeight": 60.0, "heightOfSnow": 0.9, "heightOfGrass": 0.03, "rockColor": {"py/object": "glm.vec4", "py/state": {"py/tuple": [0.33000001311302185, 0.33000001311302185, 0.33000001311302185, 1.0]}}, "rockBlendAmount": 1.14, "slopeTreshold": 0.5, "snowColor": {"py/object": "glm.vec4", "py/state": {"py/tuple": [0.9300000071525574, 0.8299999833106995, 0.8299999833106995, 1.0]}}, "grassColor": {"py/object": "glm.vec4", "py/state": {"py/tuple": [0.25999999046325684, 0.4399999976158142, 0.20000000298023224, 1.0]}}, "sandColor": {"py/object": "glm.vec4", "py/state": {"py/tuple": [1.0, 0.699999988079071, 0.5400000214576721, 1.0]}}, "tiling": {"py/object": "glm.ivec2", "py/state": {"py/tuple": [10, 10]}}, "useTextures": false}, "descriptor": {"py/object": "pyGandalf.utilities.opengl_material_lib.MaterialDescriptor", "primitive": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_TRIANGLES", 4]}, "py/state": "GL_TRIANGLES"}, "cull_enabled": true, "cull_face": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_FRONT", 1028]}, "py/state": "GL_FRONT"}, "patch_resolution": 20, "vertices_per_patch": 20, "depth_enabled": true, "depth_func": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LEQUAL", 515]}, "py/state": "GL_LEQUAL"}, "depth_mask": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_FALSE", 0]}, "py/state": "GL_FALSE"}, "blend_enabled": true, "blend_func_source": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_SRC_ALPHA", 770]}, "py/state": "GL_SRC_ALPHA"}, "blend_func_destination": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_ONE_MINUS_SRC_ALPHA", 771]}, "py/state": "GL_ONE_MINUS_SRC_ALPHA"}, "blend_equation": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_FUNC_ADD", 32774]}, "py/state": "GL_FUNC_ADD"}}, "isMeshShader": false, "shader_program": 8, "shader_params": {"u_ViewProjection": "mat4", "u_Skybox": "samplerCube"}}}'
+        }
+    }
+}
+
+def "Systems"
+{
+    def "TransformSystem"
+    {
+        custom string[] filters = ["TransformComponent"]
+        custom string name = "TransformSystem"
+    }
+
+    def "LinkSystem"
+    {
+        custom string[] filters = ["LinkComponent", "TransformComponent"]
+        custom string name = "LinkSystem"
+    }
+
+    def "CameraSystem"
+    {
+        custom string[] filters = ["CameraComponent", "TransformComponent"]
+        custom string name = "CameraSystem"
+    }
+
+    def "LightSystem"
+    {
+        custom string[] filters = ["LightComponent", "TransformComponent"]
+        custom string name = "LightSystem"
+    }
+
+    def "TerrainGenerationSystem"
+    {
+        custom string[] filters = ["TerrainComponent", "StaticMeshComponent", "TransformComponent", "ComputeComponent"]
+        custom string name = "TerrainGenerationSystem"
+    }
+
+    def "OpenGLComputePipelineSystem"
+    {
+        custom string[] filters = ["ComputeComponent"]
+        custom string name = "OpenGLComputePipelineSystem"
+    }
+
+    def "OpenGLStaticMeshRenderingSystem"
+    {
+        custom string[] filters = ["StaticMeshComponent", "MaterialComponent", "TransformComponent"]
+        custom string name = "OpenGLStaticMeshRenderingSystem"
+    }
+
+    def "CameraControllerSystem"
+    {
+        custom string[] filters = ["CameraControllerComponent", "CameraComponent", "TransformComponent"]
+        custom string name = "CameraControllerSystem"
+    }
+}
+
+def "Textures"
+{
+    def "grassAlbedo"
+    {
+        custom string data = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureData", "path": {"py/reduce": [{"py/type": "pathlib.WindowsPath"}, {"py/tuple": ["terrain", "Grass_A_BaseColor.png"]}]}, "image_bytes": null, "width": 2048, "height": 2048}'
+        custom string descriptor = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureDescriptor", "flip": false, "dimention": {"py/reduce": [{"py/type": "pyGandalf.utilities.opengl_texture_lib.TextureDimension"}, {"py/tuple": [0]}]}, "internal_format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGBA8", 32856]}, "py/state": "GL_RGBA8"}, "format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGBA", 6408]}, "py/state": "GL_RGBA"}, "type": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_UNSIGNED_BYTE", 5121]}, "py/state": "GL_UNSIGNED_BYTE"}, "wrap_s": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_REPEAT", 10497]}, "py/state": "GL_REPEAT"}, "wrap_t": {"py/id": 5}, "min_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LINEAR_MIPMAP_LINEAR", 9987]}, "py/state": "GL_LINEAR_MIPMAP_LINEAR"}, "max_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LINEAR", 9729]}, "py/state": "GL_LINEAR"}}'
+        custom int id = 3
+        custom string name = "grassAlbedo"
+        custom float slot = 0
+    }
+
+    def "snowAlbedo"
+    {
+        custom string data = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureData", "path": {"py/reduce": [{"py/type": "pathlib.WindowsPath"}, {"py/tuple": ["terrain", "Snow_BaseColor.png"]}]}, "image_bytes": null, "width": 2048, "height": 2048}'
+        custom string descriptor = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureDescriptor", "flip": false, "dimention": {"py/reduce": [{"py/type": "pyGandalf.utilities.opengl_texture_lib.TextureDimension"}, {"py/tuple": [0]}]}, "internal_format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGBA8", 32856]}, "py/state": "GL_RGBA8"}, "format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGBA", 6408]}, "py/state": "GL_RGBA"}, "type": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_UNSIGNED_BYTE", 5121]}, "py/state": "GL_UNSIGNED_BYTE"}, "wrap_s": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_REPEAT", 10497]}, "py/state": "GL_REPEAT"}, "wrap_t": {"py/id": 5}, "min_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LINEAR_MIPMAP_LINEAR", 9987]}, "py/state": "GL_LINEAR_MIPMAP_LINEAR"}, "max_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LINEAR", 9729]}, "py/state": "GL_LINEAR"}}'
+        custom int id = 4
+        custom string name = "snowAlbedo"
+        custom float slot = 1
+    }
+
+    def "sandAlbedo"
+    {
+        custom string data = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureData", "path": {"py/reduce": [{"py/type": "pathlib.WindowsPath"}, {"py/tuple": ["terrain", "Sand_BaseColor.png"]}]}, "image_bytes": null, "width": 2048, "height": 2048}'
+        custom string descriptor = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureDescriptor", "flip": false, "dimention": {"py/reduce": [{"py/type": "pyGandalf.utilities.opengl_texture_lib.TextureDimension"}, {"py/tuple": [0]}]}, "internal_format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGBA8", 32856]}, "py/state": "GL_RGBA8"}, "format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGBA", 6408]}, "py/state": "GL_RGBA"}, "type": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_UNSIGNED_BYTE", 5121]}, "py/state": "GL_UNSIGNED_BYTE"}, "wrap_s": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_REPEAT", 10497]}, "py/state": "GL_REPEAT"}, "wrap_t": {"py/id": 5}, "min_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LINEAR_MIPMAP_LINEAR", 9987]}, "py/state": "GL_LINEAR_MIPMAP_LINEAR"}, "max_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LINEAR", 9729]}, "py/state": "GL_LINEAR"}}'
+        custom int id = 5
+        custom string name = "sandAlbedo"
+        custom float slot = 2
+    }
+
+    def "grassNormal"
+    {
+        custom string data = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureData", "path": {"py/reduce": [{"py/type": "pathlib.WindowsPath"}, {"py/tuple": ["terrain", "Grass_A_Normal.png"]}]}, "image_bytes": null, "width": 2048, "height": 2048}'
+        custom string descriptor = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureDescriptor", "flip": false, "dimention": {"py/reduce": [{"py/type": "pyGandalf.utilities.opengl_texture_lib.TextureDimension"}, {"py/tuple": [0]}]}, "internal_format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGBA8", 32856]}, "py/state": "GL_RGBA8"}, "format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGBA", 6408]}, "py/state": "GL_RGBA"}, "type": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_UNSIGNED_BYTE", 5121]}, "py/state": "GL_UNSIGNED_BYTE"}, "wrap_s": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_REPEAT", 10497]}, "py/state": "GL_REPEAT"}, "wrap_t": {"py/id": 5}, "min_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LINEAR_MIPMAP_LINEAR", 9987]}, "py/state": "GL_LINEAR_MIPMAP_LINEAR"}, "max_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LINEAR", 9729]}, "py/state": "GL_LINEAR"}}'
+        custom int id = 6
+        custom string name = "grassNormal"
+        custom float slot = 3
+    }
+
+    def "snowNormal"
+    {
+        custom string data = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureData", "path": {"py/reduce": [{"py/type": "pathlib.WindowsPath"}, {"py/tuple": ["terrain", "Snow_Normal.png"]}]}, "image_bytes": null, "width": 2048, "height": 2048}'
+        custom string descriptor = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureDescriptor", "flip": false, "dimention": {"py/reduce": [{"py/type": "pyGandalf.utilities.opengl_texture_lib.TextureDimension"}, {"py/tuple": [0]}]}, "internal_format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGBA8", 32856]}, "py/state": "GL_RGBA8"}, "format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGBA", 6408]}, "py/state": "GL_RGBA"}, "type": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_UNSIGNED_BYTE", 5121]}, "py/state": "GL_UNSIGNED_BYTE"}, "wrap_s": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_REPEAT", 10497]}, "py/state": "GL_REPEAT"}, "wrap_t": {"py/id": 5}, "min_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LINEAR_MIPMAP_LINEAR", 9987]}, "py/state": "GL_LINEAR_MIPMAP_LINEAR"}, "max_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LINEAR", 9729]}, "py/state": "GL_LINEAR"}}'
+        custom int id = 7
+        custom string name = "snowNormal"
+        custom float slot = 4
+    }
+
+    def "sandNormal"
+    {
+        custom string data = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureData", "path": {"py/reduce": [{"py/type": "pathlib.WindowsPath"}, {"py/tuple": ["terrain", "Sand_Normal.png"]}]}, "image_bytes": null, "width": 2048, "height": 2048}'
+        custom string descriptor = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureDescriptor", "flip": false, "dimention": {"py/reduce": [{"py/type": "pyGandalf.utilities.opengl_texture_lib.TextureDimension"}, {"py/tuple": [0]}]}, "internal_format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGBA8", 32856]}, "py/state": "GL_RGBA8"}, "format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGBA", 6408]}, "py/state": "GL_RGBA"}, "type": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_UNSIGNED_BYTE", 5121]}, "py/state": "GL_UNSIGNED_BYTE"}, "wrap_s": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_REPEAT", 10497]}, "py/state": "GL_REPEAT"}, "wrap_t": {"py/id": 5}, "min_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LINEAR_MIPMAP_LINEAR", 9987]}, "py/state": "GL_LINEAR_MIPMAP_LINEAR"}, "max_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LINEAR", 9729]}, "py/state": "GL_LINEAR"}}'
+        custom int id = 8
+        custom string name = "sandNormal"
+        custom float slot = 5
+    }
+
+    def "grassMask"
+    {
+        custom string data = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureData", "path": {"py/reduce": [{"py/type": "pathlib.WindowsPath"}, {"py/tuple": ["terrain", "Grass_A_MaskMap.png"]}]}, "image_bytes": null, "width": 2048, "height": 2048}'
+        custom string descriptor = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureDescriptor", "flip": false, "dimention": {"py/reduce": [{"py/type": "pyGandalf.utilities.opengl_texture_lib.TextureDimension"}, {"py/tuple": [0]}]}, "internal_format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGBA8", 32856]}, "py/state": "GL_RGBA8"}, "format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGBA", 6408]}, "py/state": "GL_RGBA"}, "type": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_UNSIGNED_BYTE", 5121]}, "py/state": "GL_UNSIGNED_BYTE"}, "wrap_s": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_REPEAT", 10497]}, "py/state": "GL_REPEAT"}, "wrap_t": {"py/id": 5}, "min_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LINEAR_MIPMAP_LINEAR", 9987]}, "py/state": "GL_LINEAR_MIPMAP_LINEAR"}, "max_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LINEAR", 9729]}, "py/state": "GL_LINEAR"}}'
+        custom int id = 9
+        custom string name = "grassMask"
+        custom float slot = 6
+    }
+
+    def "snowMask"
+    {
+        custom string data = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureData", "path": {"py/reduce": [{"py/type": "pathlib.WindowsPath"}, {"py/tuple": ["terrain", "Snow_MaskMap.png"]}]}, "image_bytes": null, "width": 2048, "height": 2048}'
+        custom string descriptor = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureDescriptor", "flip": false, "dimention": {"py/reduce": [{"py/type": "pyGandalf.utilities.opengl_texture_lib.TextureDimension"}, {"py/tuple": [0]}]}, "internal_format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGBA8", 32856]}, "py/state": "GL_RGBA8"}, "format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGBA", 6408]}, "py/state": "GL_RGBA"}, "type": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_UNSIGNED_BYTE", 5121]}, "py/state": "GL_UNSIGNED_BYTE"}, "wrap_s": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_REPEAT", 10497]}, "py/state": "GL_REPEAT"}, "wrap_t": {"py/id": 5}, "min_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LINEAR_MIPMAP_LINEAR", 9987]}, "py/state": "GL_LINEAR_MIPMAP_LINEAR"}, "max_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LINEAR", 9729]}, "py/state": "GL_LINEAR"}}'
+        custom int id = 10
+        custom string name = "snowMask"
+        custom float slot = 7
+    }
+
+    def "sandMask"
+    {
+        custom string data = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureData", "path": {"py/reduce": [{"py/type": "pathlib.WindowsPath"}, {"py/tuple": ["terrain", "Sand_MaskMap.png"]}]}, "image_bytes": null, "width": 2048, "height": 2048}'
+        custom string descriptor = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureDescriptor", "flip": false, "dimention": {"py/reduce": [{"py/type": "pyGandalf.utilities.opengl_texture_lib.TextureDimension"}, {"py/tuple": [0]}]}, "internal_format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGBA8", 32856]}, "py/state": "GL_RGBA8"}, "format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGBA", 6408]}, "py/state": "GL_RGBA"}, "type": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_UNSIGNED_BYTE", 5121]}, "py/state": "GL_UNSIGNED_BYTE"}, "wrap_s": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_REPEAT", 10497]}, "py/state": "GL_REPEAT"}, "wrap_t": {"py/id": 5}, "min_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LINEAR_MIPMAP_LINEAR", 9987]}, "py/state": "GL_LINEAR_MIPMAP_LINEAR"}, "max_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LINEAR", 9729]}, "py/state": "GL_LINEAR"}}'
+        custom int id = 11
+        custom string name = "sandMask"
+        custom float slot = 8
+    }
+
+    def "rockAlbedo"
+    {
+        custom string data = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureData", "path": {"py/reduce": [{"py/type": "pathlib.WindowsPath"}, {"py/tuple": ["terrain", "Rock_BaseColor.png"]}]}, "image_bytes": null, "width": 2048, "height": 2048}'
+        custom string descriptor = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureDescriptor", "flip": false, "dimention": {"py/reduce": [{"py/type": "pyGandalf.utilities.opengl_texture_lib.TextureDimension"}, {"py/tuple": [0]}]}, "internal_format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGBA8", 32856]}, "py/state": "GL_RGBA8"}, "format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGBA", 6408]}, "py/state": "GL_RGBA"}, "type": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_UNSIGNED_BYTE", 5121]}, "py/state": "GL_UNSIGNED_BYTE"}, "wrap_s": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_REPEAT", 10497]}, "py/state": "GL_REPEAT"}, "wrap_t": {"py/id": 5}, "min_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LINEAR_MIPMAP_LINEAR", 9987]}, "py/state": "GL_LINEAR_MIPMAP_LINEAR"}, "max_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LINEAR", 9729]}, "py/state": "GL_LINEAR"}}'
+        custom int id = 12
+        custom string name = "rockAlbedo"
+        custom float slot = 9
+    }
+
+    def "rockNormal"
+    {
+        custom string data = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureData", "path": {"py/reduce": [{"py/type": "pathlib.WindowsPath"}, {"py/tuple": ["terrain", "Rock_Normal.png"]}]}, "image_bytes": null, "width": 2048, "height": 2048}'
+        custom string descriptor = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureDescriptor", "flip": false, "dimention": {"py/reduce": [{"py/type": "pyGandalf.utilities.opengl_texture_lib.TextureDimension"}, {"py/tuple": [0]}]}, "internal_format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGBA8", 32856]}, "py/state": "GL_RGBA8"}, "format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGBA", 6408]}, "py/state": "GL_RGBA"}, "type": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_UNSIGNED_BYTE", 5121]}, "py/state": "GL_UNSIGNED_BYTE"}, "wrap_s": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_REPEAT", 10497]}, "py/state": "GL_REPEAT"}, "wrap_t": {"py/id": 5}, "min_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LINEAR_MIPMAP_LINEAR", 9987]}, "py/state": "GL_LINEAR_MIPMAP_LINEAR"}, "max_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LINEAR", 9729]}, "py/state": "GL_LINEAR"}}'
+        custom int id = 13
+        custom string name = "rockNormal"
+        custom float slot = 10
+    }
+
+    def "rockMask"
+    {
+        custom string data = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureData", "path": {"py/reduce": [{"py/type": "pathlib.WindowsPath"}, {"py/tuple": ["terrain", "Rock_MaskMap.png"]}]}, "image_bytes": null, "width": 2048, "height": 2048}'
+        custom string descriptor = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureDescriptor", "flip": false, "dimention": {"py/reduce": [{"py/type": "pyGandalf.utilities.opengl_texture_lib.TextureDimension"}, {"py/tuple": [0]}]}, "internal_format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGBA8", 32856]}, "py/state": "GL_RGBA8"}, "format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGBA", 6408]}, "py/state": "GL_RGBA"}, "type": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_UNSIGNED_BYTE", 5121]}, "py/state": "GL_UNSIGNED_BYTE"}, "wrap_s": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_REPEAT", 10497]}, "py/state": "GL_REPEAT"}, "wrap_t": {"py/id": 5}, "min_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LINEAR_MIPMAP_LINEAR", 9987]}, "py/state": "GL_LINEAR_MIPMAP_LINEAR"}, "max_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LINEAR", 9729]}, "py/state": "GL_LINEAR"}}'
+        custom int id = 14
+        custom string name = "rockMask"
+        custom float slot = 11
+    }
+
+    def "heightmap"
+    {
+        custom string data = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureData", "path": null, "image_bytes": null, "width": 512, "height": 512}'
+        custom string descriptor = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureDescriptor", "flip": false, "dimention": {"py/reduce": [{"py/type": "pyGandalf.utilities.opengl_texture_lib.TextureDimension"}, {"py/tuple": [0]}]}, "internal_format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGBA32F", 34836]}, "py/state": "GL_RGBA32F"}, "format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGBA", 6408]}, "py/state": "GL_RGBA"}, "type": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_FLOAT", 5126]}, "py/state": "GL_FLOAT"}, "wrap_s": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_CLAMP_TO_EDGE", 33071]}, "py/state": "GL_CLAMP_TO_EDGE"}, "wrap_t": {"py/id": 5}, "min_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LINEAR", 9729]}, "py/state": "GL_LINEAR"}, "max_filter": {"py/id": 6}}'
+        custom int id = 15
+        custom string name = "heightmap"
+        custom float slot = 12
+    }
+
+    def "cloudy_cube_map"
+    {
+        custom string data = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureData", "path": [{"py/reduce": [{"py/type": "pathlib.WindowsPath"}, {"py/tuple": ["skybox", "cloudy", "right.jpg"]}]}, {"py/reduce": [{"py/type": "pathlib.WindowsPath"}, {"py/tuple": ["skybox", "cloudy", "left.jpg"]}]}, {"py/reduce": [{"py/type": "pathlib.WindowsPath"}, {"py/tuple": ["skybox", "cloudy", "top.jpg"]}]}, {"py/reduce": [{"py/type": "pathlib.WindowsPath"}, {"py/tuple": ["skybox", "cloudy", "bottom.jpg"]}]}, {"py/reduce": [{"py/type": "pathlib.WindowsPath"}, {"py/tuple": ["skybox", "cloudy", "front.jpg"]}]}, {"py/reduce": [{"py/type": "pathlib.WindowsPath"}, {"py/tuple": ["skybox", "cloudy", "back.jpg"]}]}], "image_bytes": null, "width": 0, "height": 0}'
+        custom string descriptor = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureDescriptor", "flip": true, "dimention": {"py/reduce": [{"py/type": "pyGandalf.utilities.opengl_texture_lib.TextureDimension"}, {"py/tuple": [2]}]}, "internal_format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGB8", 32849]}, "py/state": "GL_RGB8"}, "format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_RGB", 6407]}, "py/state": "GL_RGB"}, "type": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_UNSIGNED_BYTE", 5121]}, "py/state": "GL_UNSIGNED_BYTE"}, "wrap_s": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_REPEAT", 10497]}, "py/state": "GL_REPEAT"}, "wrap_t": {"py/id": 5}, "min_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LINEAR", 9729]}, "py/state": "GL_LINEAR"}, "max_filter": {"py/id": 6}}'
+        custom int id = 16
+        custom string name = "cloudy_cube_map"
+        custom float slot = 13
+    }
+
+    def "depth_texture"
+    {
+        custom string data = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureData", "path": null, "image_bytes": null, "width": 1024, "height": 1024}'
+        custom string descriptor = '{"py/object": "pyGandalf.utilities.opengl_texture_lib.TextureDescriptor", "flip": false, "dimention": {"py/reduce": [{"py/type": "pyGandalf.utilities.opengl_texture_lib.TextureDimension"}, {"py/tuple": [0]}]}, "internal_format": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_DEPTH_COMPONENT", 6402]}, "py/state": "GL_DEPTH_COMPONENT"}, "format": {"py/id": 2}, "type": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_FLOAT", 5126]}, "py/state": "GL_FLOAT"}, "wrap_s": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_CLAMP_TO_BORDER", 33069]}, "py/state": "GL_CLAMP_TO_BORDER"}, "wrap_t": {"py/id": 4}, "min_filter": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_NEAREST", 9728]}, "py/state": "GL_NEAREST"}, "max_filter": {"py/id": 5}}'
+        custom int id = 17
+        custom string name = "depth_texture"
+        custom float slot = 14
+    }
+}
+
+def "Shaders"
+{
+    def "default_tessellation"
+    {
+        custom string fs_path = "opengl\\procedural.fs"
+        custom string gs_path = ""
+        custom string name = "default_tessellation"
+        custom int shader_program = 5
+        custom string tcs_path = "opengl\\procedural.tcs"
+        custom string tes_path = "opengl\\procedural.tes"
+        custom string vs_path = "opengl\\procedural.vs"
+    }
+
+    def "skybox"
+    {
+        custom string fs_path = "opengl\\skybox.fs"
+        custom string gs_path = ""
+        custom string name = "skybox"
+        custom int shader_program = 8
+        custom string tcs_path = ""
+        custom string tes_path = ""
+        custom string vs_path = "opengl\\skybox.vs"
+    }
+}
+
+def "Materials"
+{
+    def "M_Terrain"
+    {
+        custom string base_template = "default_tessellation"
+        custom color4f color = (1, 1, 1, 1)
+        custom string descriptor = '{"py/object": "pyGandalf.utilities.opengl_material_lib.MaterialDescriptor", "primitive": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_PATCHES", 14]}, "py/state": "GL_PATCHES"}, "cull_enabled": true, "cull_face": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_FRONT", 1028]}, "py/state": "GL_FRONT"}, "patch_resolution": 8, "vertices_per_patch": 4, "depth_enabled": true, "depth_func": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LEQUAL", 515]}, "py/state": "GL_LEQUAL"}, "depth_mask": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_TRUE", 1]}, "py/state": "GL_TRUE"}, "blend_enabled": true, "blend_func_source": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_SRC_ALPHA", 770]}, "py/state": "GL_SRC_ALPHA"}, "blend_func_destination": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_ONE_MINUS_SRC_ALPHA", 771]}, "py/state": "GL_ONE_MINUS_SRC_ALPHA"}, "blend_equation": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_FUNC_ADD", 32774]}, "py/state": "GL_FUNC_ADD"}}'
+        custom float glossiness = 3
+        custom string name = "M_Terrain"
+        custom string[] textures = ["grassAlbedo", "snowAlbedo", "sandAlbedo", "grassNormal", "snowNormal", "sandNormal", "grassMask", "snowMask", "sandMask", "rockAlbedo", "rockNormal", "rockMask", "heightmap"]
+    }
+
+    def "M_CloudySkybox"
+    {
+        custom string base_template = "skybox"
+        custom color4f color = (1, 1, 1, 1)
+        custom string descriptor = '{"py/object": "pyGandalf.utilities.opengl_material_lib.MaterialDescriptor", "primitive": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_TRIANGLES", 4]}, "py/state": "GL_TRIANGLES"}, "cull_enabled": true, "cull_face": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_FRONT", 1028]}, "py/state": "GL_FRONT"}, "patch_resolution": 20, "vertices_per_patch": 20, "depth_enabled": true, "depth_func": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_LEQUAL", 515]}, "py/state": "GL_LEQUAL"}, "depth_mask": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_FALSE", 0]}, "py/state": "GL_FALSE"}, "blend_enabled": true, "blend_func_source": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_SRC_ALPHA", 770]}, "py/state": "GL_SRC_ALPHA"}, "blend_func_destination": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_ONE_MINUS_SRC_ALPHA", 771]}, "py/state": "GL_ONE_MINUS_SRC_ALPHA"}, "blend_equation": {"py/object": "OpenGL.constant.IntConstant", "py/newargs": {"py/tuple": ["GL_FUNC_ADD", 32774]}, "py/state": "GL_FUNC_ADD"}}'
+        custom float glossiness = 3
+        custom string name = "M_CloudySkybox"
+        custom string[] textures = ["cloudy_cube_map"]
+    }
+}
+
+def "Meshes"
+{
+}
+
+def "Renderer"
+{
+    def "Shadows"
+    {
+        custom bool enabled = 0
+    }
+}
+
+def "Decorators"
+{
+    def "Components"
+    {
+        custom string dict = "{\"<class 'pyGandalf.scene.components.TransformComponent'>\": {\"py/type\": \"pyGandalf.scene.components.TransformComponent\"}}"
+    }
+}
+

@@ -64,14 +64,17 @@ void main()
     vec4 p1 = (p11 - p10) * u + p10;
     vec4 p = (p1 - p0) * v + p0;
 
-    height = texture(imgOutput, texCoord).r;
-    float heightR = texelFetch(imgOutput, ivec2((texCoord.x * 512) + 1, texCoord.y * 512), 0).r;
-    float heightB = texelFetch(imgOutput, ivec2(texCoord.x * 512, (texCoord.y * 512) + 1), 0).r;
-    float heightT = texelFetch(imgOutput, ivec2(texCoord.x * 512, (texCoord.y * 512) - 1), 0).r;
-    float heightL = texelFetch(imgOutput, ivec2((texCoord.x * 512) - 1, texCoord.y * 512), 0).r;
+    vec2 heightMapCoords = texCoord;
+    heightMapCoords.x = (float(mapSize) / 64.0) * texCoord.x;
+    heightMapCoords.y = (float(mapSize) / 64.0) * texCoord.y;
+    height = texture(imgOutput, heightMapCoords).r;
+    float heightR = texture(imgOutput, vec2(heightMapCoords.x + 1.0/mapSize, heightMapCoords.y)).r;
+    float heightB = texture(imgOutput, vec2(heightMapCoords.x, heightMapCoords.y + 1.0/mapSize)).r;
+    float heightT = texture(imgOutput, vec2(heightMapCoords.x, heightMapCoords.y - 1.0/mapSize)).r;
+    float heightL = texture(imgOutput, vec2(heightMapCoords.x - 1.0/mapSize, heightMapCoords.y)).r;
     
-    texCoord.x = texCoord.x + invLerp(0.0, 512.0, cameraCoords.x);
-    texCoord.y = texCoord.y + invLerp(0.0, 512.0, cameraCoords.y);
+    texCoord.x += invLerp(0.0, 512.0, cameraCoords.x);
+    texCoord.y += invLerp(0.0, 512.0, cameraCoords.y);
     v_TexCoord = texCoord * tiling;
 
     vec3 vecX = vec3(2, (heightR - heightL) * elevationScale, 0);

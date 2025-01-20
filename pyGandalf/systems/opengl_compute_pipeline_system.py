@@ -4,16 +4,19 @@ from pyGandalf.scene.entity import Entity
 from pyGandalf.scene.components import Component
 from pyGandalf.scene.components import ComputeComponent, GUIData
 from pyGandalf.utilities.opengl_shader_lib import OpenGLShaderLib
+from pyGandalf.utilities.opengl_texture_lib import OpenGLTextureLib
 from pyGandalf.utilities.opengl_material_lib import MaterialInstance
 from pyGandalf.utilities.definitions import SHADERS_PATH
 import glm
+from PIL import Image, ImageDraw
+import ctypes
+import numpy as np
 
 class OpenGLComputePipelineSystem(System):
 
     def on_create_entity(self, entity: Entity, components: Component | tuple[Component]):
         compute: ComputeComponent = components
         computeCode = OpenGLShaderLib().load_from_file(compute.shader)
-        #compute_rel_path = Path(os.path.relpath(compute.shader, SHADERS_PATH))
 
         compute_shader = OpenGLShaderLib().compile_shader(computeCode, gl.GL_COMPUTE_SHADER)
         shader_program = gl.glCreateProgram()
@@ -96,4 +99,21 @@ class OpenGLComputePipelineSystem(System):
         gl.glDispatchCompute(compute.workGroupsX, compute.workGroupsY, compute.workGroupsZ)
         gl.glMemoryBarrier(gl.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT)
         gl.glUseProgram(0)
+
+        if compute.save:
+            self.export_texture("heightmap.png")
+            compute.save = False
+
+    def export_texture(self, filename):
+        gl.glBindTexture(gl.GL_TEXTURE_2D, OpenGLTextureLib().get_id("heightmap"))
+        heightmap = gl.glGetTexImage(gl.GL_TEXTURE_2D, 0, gl.GL_RGBA, gl.GL_FLOAT)
+
+        image = Image.new('RGB', (heightmap.shape[0], heightmap.shape[1]), 0)
+        draw = ImageDraw.ImageDraw(image)
+        for z in range(heightmap.shape[0]):
+            for x in range(heightmap.shape[1]):
+                draw.point((z, x), (int(heightmap[z][x][0] * 255), int(heightmap[z][x][0] * 255), int(heightmap[z][x][0] * 255)))
+        image.save(filename)
+        print(filename, "saved")
+        return image.width, image.height
 

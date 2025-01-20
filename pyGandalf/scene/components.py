@@ -157,12 +157,13 @@ class GUIType(Enum):
     COMBO = 3
 
 class GUIData:
-    def __init__(self, speed = 0, min = 0, max = 0, type: GUIType = GUIType.DRAG, comboValues = ['', '']):
+    def __init__(self, speed = 0, min = 0, max = 0, type: GUIType = GUIType.DRAG, comboValues = ['', ''], hidden = False):
         self.speed = speed
         self.min = min
         self.max = max
         self.type = type
         self.comboValues = comboValues
+        self.hidden = hidden
 
 class ComputeComponent(Component):
     def __init__(self, compute_shader: str, textures: list[int], x: int, y: int, z: int, uniformsData = [], guiData: dict[str, GUIData] = {}):
@@ -177,3 +178,5 @@ class ComputeComponent(Component):
         self.workGroupsX = x
         self.workGroupsY = y
         self.workGroupsZ = z
+
+        self.save = False

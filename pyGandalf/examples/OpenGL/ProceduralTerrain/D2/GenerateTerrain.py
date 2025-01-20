@@ -20,7 +20,7 @@ from pyGandalf.scene.scene_manager import SceneManager
 from pyGandalf.scene.components import *
 
 from pyGandalf.utilities.opengl_material_lib import OpenGLMaterialLib, MaterialData, MaterialDescriptor
-from pyGandalf.utilities.opengl_texture_lib import OpenGLTextureLib, TextureData, TextureDescriptor
+from pyGandalf.utilities.opengl_texture_lib import OpenGLTextureLib, TextureData, TextureDescriptor, TextureDimension
 from pyGandalf.utilities.opengl_shader_lib import OpenGLShaderLib
 
 from pyGandalf.utilities.definitions import SHADERS_PATH
@@ -49,10 +49,37 @@ def main():
     camera = scene.enroll_entity()
     terrain = scene.enroll_entity()
     light = scene.enroll_entity()
-    terrainComponent = TerrainComponent(200, 25, 512, patch_resolution, vertices_per_patch, camera)
+    skybox = scene.enroll_entity()
+    terrainComponent = TerrainComponent(200, 25, 256, patch_resolution, vertices_per_patch, camera)
+
+        # Array that holds all the cloudy skybox textures
+    cloudy_skybox_textures = [
+        TEXTURES_PATH / 'skybox' / 'cloudy' / 'right.jpg',
+        TEXTURES_PATH / 'skybox' / 'cloudy' / 'left.jpg',
+        TEXTURES_PATH / 'skybox' / 'cloudy' / 'top.jpg',
+        TEXTURES_PATH / 'skybox' / 'cloudy' / 'bottom.jpg',
+        TEXTURES_PATH / 'skybox' / 'cloudy' / 'front.jpg',
+        TEXTURES_PATH / 'skybox' / 'cloudy' / 'back.jpg'
+    ]
+
+        # Vertices for the cube
+    verticesSkybox = np.array([
+        [-1.0, -1.0, -1.0], [-1.0, -1.0,  1.0], [-1.0,  1.0,  1.0], [ 1.0,  1.0, -1.0],
+        [-1.0, -1.0, -1.0], [-1.0,  1.0, -1.0], [1.0, -1.0,  1.0], [-1.0, -1.0, -1.0],
+        [1.0, -1.0, -1.0], [ 1.0,  1.0, -1.0], [1.0, -1.0, -1.0], [-1.0, -1.0, -1.0],
+
+        [-1.0, -1.0, -1.0], [-1.0,  1.0,  1.0], [-1.0,  1.0, -1.0], [ 1.0, -1.0,  1.0],
+        [-1.0, -1.0,  1.0], [-1.0, -1.0, -1.0], [-1.0,  1.0,  1.0], [-1.0, -1.0,  1.0],
+        [1.0, -1.0,  1.0], [1.0,  1.0,  1.0], [1.0, -1.0, -1.0], [1.0,  1.0, -1.0],
+
+        [1.0, -1.0, -1.0], [1.0,  1.0,  1.0], [1.0, -1.0,  1.0], [1.0,  1.0,  1.0],
+        [1.0,  1.0, -1.0], [-1.0,  1.0, -1.0], [1.0,  1.0,  1.0], [-1.0,  1.0, -1.0],
+        [-1.0,  1.0,  1.0], [1.0,  1.0,  1.0], [-1.0,  1.0,  1.0], [1.0, -1.0,  1.0]
+    ], dtype=np.float32)
 
     # Build shaders
     OpenGLShaderLib().build('default_tessellation', SHADERS_PATH / 'opengl' / 'procedural.vs', SHADERS_PATH / 'opengl' / 'procedural.fs', None, SHADERS_PATH / 'opengl' / 'procedural.tcs', SHADERS_PATH / 'opengl' / 'procedural.tes')
+    OpenGLShaderLib().build('skybox', SHADERS_PATH / 'opengl' / 'skybox.vs', SHADERS_PATH / 'opengl' / 'skybox.fs')
     descriptor = TextureDescriptor(min_filter=gl.GL_LINEAR_MIPMAP_LINEAR)
     computeTextureDescriptor = TextureDescriptor(internal_format=gl.GL_RGBA32F, type=gl.GL_FLOAT, wrap_s=gl.GL_CLAMP_TO_EDGE, wrap_t=gl.GL_CLAMP_TO_EDGE)
     OpenGLTextureLib().build('grassAlbedo', TextureData(TEXTURES_PATH / 'terrain' / 'Grass_A_BaseColor.png'), descriptor)
@@ -72,11 +99,14 @@ def main():
     OpenGLTextureLib().build('rockMask', TextureData(TEXTURES_PATH / 'terrain' / 'Rock_MaskMap.png'), descriptor)
 
     OpenGLTextureLib().build('heightmap', TextureData(width=512, height=512), computeTextureDescriptor)
+    OpenGLTextureLib().build('cloudy_cube_map', TextureData(cloudy_skybox_textures), descriptor=TextureDescriptor(flip=True, dimention=TextureDimension.CUBE, internal_format=gl.GL_RGB8, format=gl.GL_RGB))
+
     # Build Materials
     OpenGLMaterialLib().build('M_Terrain', MaterialData('default_tessellation', ['grassAlbedo', 'snowAlbedo', 'sandAlbedo', 
                                                                                  'grassNormal', 'snowNormal', 'sandNormal', 
                                                                                  'grassMask', 'snowMask', 'sandMask', 
                                                                                  'rockAlbedo', 'rockNormal', 'rockMask', 'heightmap']), MaterialDescriptor(primitive=gl.GL_PATCHES, cull_face=gl.GL_FRONT, patch_resolution=terrainComponent.patch_resolution, vertices_per_patch=terrainComponent.vertices_per_patch))
+    OpenGLMaterialLib().build('M_CloudySkybox', MaterialData('skybox', ['cloudy_cube_map']), MaterialDescriptor(cull_face=gl.GL_FRONT, depth_mask=gl.GL_FALSE))
 
     vertices = [[0.0, 0.0, 0.0]]
     tex_coords = [[0.0, 0.0]]
@@ -97,10 +127,11 @@ def main():
     scene.add_component(terrain, MaterialComponent('M_Terrain'))
     scene.add_component(terrain, terrainComponent)
     scene.add_component(terrain, ComputeComponent(SHADERS_PATH / 'opengl' / 'heightmap.compute', [OpenGLTextureLib().get_id('heightmap')], 
-                    512, 512, 1, [0, 200, 0.2, 2.0, 0.5, 12, 1, 1, 1, 33, 0, 0, 0.2, 2.2, 0.4, 0, glm.vec2(0.0, 0.0)],
+                    512, 512, 1, [0, 200, 0.2, 2.0, 0.5, 12, 1, 1, 1, 33, 0, 0, 0.2, 2.2, 0.4, 0, glm.vec2(0.0, 0.0), 256, 0, 0.0, 10.0],
                     {'turbulance': GUIData(type=GUIType.CHECKBOX), 'fallOffEnabled': GUIData(type=GUIType.CHECKBOX), 
                      'Ridges': GUIData(type=GUIType.CHECKBOX), 'fallOffType': GUIData(type=GUIType.COMBO, comboValues=['Circle', 'Rectangle']),
-                     'underWaterRavines': GUIData(type=GUIType.CHECKBOX)}))
+                     'underWaterRavines': GUIData(type=GUIType.CHECKBOX), 'mapSize': GUIData(hidden=True), 'clampHeight': GUIData(type=GUIType.CHECKBOX),
+                     'minHeight': GUIData(speed=0.01, min=-2.0, max=100.0)}))
 
     # Register components to camera
     scene.add_component(camera, InfoComponent("camera"))
@@ -124,6 +155,13 @@ def main():
     scene.register_system(OpenGLComputePipelineSystem([ComputeComponent]))
     scene.register_system(OpenGLStaticMeshRenderingSystem([StaticMeshComponent, MaterialComponent, TransformComponent]))
     scene.register_system(CameraControllerSystem([CameraControllerComponent, CameraComponent, TransformComponent]))
+
+    # Register components to cloudy_skybox
+    scene.add_component(skybox, InfoComponent("cloudy_skybox"))
+    scene.add_component(skybox, TransformComponent(glm.vec3(0, 0, 0), glm.vec3(0, 0, 0), glm.vec3(1, 1, 1)))
+    scene.add_component(skybox, LinkComponent(None))
+    scene.add_component(skybox, StaticMeshComponent('skybox', [verticesSkybox]))
+    scene.add_component(skybox, MaterialComponent('M_CloudySkybox'))
 
     # Add scene to manager
     SceneManager().add_scene(scene)

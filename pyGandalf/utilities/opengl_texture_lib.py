@@ -55,59 +55,6 @@ class OpenGLTextureLib(object):
             cls.instance.current_slot = 0
         return cls.instance
     
-    def update(cls, name: str, data: TextureData, descriptor: TextureDescriptor = TextureDescriptor()):
-        """Updates a texture (if it exists with that name) and returns its slot.
-
-        Args:
-            name (str): The name of the texture.
-            data (TextureData): The data of the texture. You can either give a path (or list of paths if cubemap) or the byte data to use when creating the texture and the width and height.
-            descriptor (TextureDescriptor, optional): The description of the texture, which consists of various options and flags.
-
-        Returns:
-            int: The texture slot.
-        """
-        if cls.instance.textures.get(name) == None:
-            return 
-
-        img_bytes = data.image_bytes
-        img = None
-
-        if (data.path is None or type(data.path) is not list) and type(data.image_bytes) is not list:
-            assert descriptor.dimention == TextureDimension.D2 or descriptor.dimention == TextureDimension.D3, "Single texture path only supported for 2d or 3d textures dimensions"
-
-            if data.path is not None:
-                img = Image.open(data.path)
-                if descriptor.flip:
-                    img = img.transpose(Image.FLIP_TOP_BOTTOM)
-                img_bytes = img.convert("RGBA").tobytes("raw", "RGBA", 0, -1)
-
-            texture_id = cls.instance.textures[name].id        
-            gl.glBindTexture(gl.GL_TEXTURE_2D, texture_id)
-            gl.glTexImage2D(
-                gl.GL_TEXTURE_2D,                                     #Target
-                0,                                                    # Level
-                descriptor.internal_format,                           # Internal Format
-                img.width if img is not None else data.width,   # Width
-                img.height if img is not None else data.height, # Height
-                0,                                                    # Border
-                descriptor.format,                                    # Format
-                descriptor.type,                                      # Type
-                img_bytes                                             # Data
-            )
-
-            gl.glGenerateMipmap(gl.GL_TEXTURE_2D)
-
-            gl.glBindTexture(gl.GL_TEXTURE_2D, 0)
-
-            if data.path is not None:
-                data.path = Path(os.path.relpath(data.path, TEXTURES_PATH))
-
-            if img is not None:
-                data.width = img.width
-                data.height = img.height
-
-            return cls.instance.textures[name].slot
-    
     def build(cls, name: str, data: TextureData, descriptor: TextureDescriptor = TextureDescriptor()):
         """Builds a new texture (if one does not already exists with that name) and returns its slot.
 

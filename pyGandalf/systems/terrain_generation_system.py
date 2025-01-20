@@ -7,6 +7,7 @@ from pyGandalf.scene.components import ComputeComponent
 from pyGandalf.scene.components import Component
 import numpy as np
 import glm
+import OpenGL.GL as gl
 from PIL import Image, ImageDraw
 from pyGandalf.utilities.opengl_texture_lib import OpenGLTextureLib, TextureData
 
@@ -26,10 +27,11 @@ class TerrainGenerationSystem(System):
         transform: TransformComponent = components[2]
         compute: ComputeComponent = components[3]
 
-        """if terrain.mapSize != compute.workGroupsX:
+        if terrain.mapSize != compute.workGroupsX:
             compute.workGroupsX = terrain.mapSize
             compute.workGroupsY = terrain.mapSize
-            OpenGLTextureLib().update('heightmap', TextureData(width=terrain.mapSize, height=terrain.mapSize))"""
+            uniformDataIndex = list(compute.uniformsDictionary.keys()).index('mapSize')
+            compute.uniformsData[uniformDataIndex] = terrain.mapSize
 
         vertices = []
         tex_coords = []
@@ -40,9 +42,6 @@ class TerrainGenerationSystem(System):
             terrain.cameraMoved = False
 
         if terrain.generate:
-            #self.CreateHeightMap(terrain)
-            #self.export_texture(terrain.heights, "height_map.png", (terrain.mapSize, terrain.mapSize), terrain)
-            #self.Generate(terrain)
             width, height = (terrain.scale, terrain.scale)
 
             for i in range(terrain.patch_resolution):
@@ -97,33 +96,3 @@ class TerrainGenerationSystem(System):
             mesh.attributes = [terrain.vertices, tex_coords]  
             mesh.changed = True 
             terrain.generate = False
-
-    def export_texture(self, heightmap, filename, map_size=(256, 256), terrain=None):
-        image = Image.new('RGB', map_size, 0)
-        normalImage = Image.new('RGB', map_size, 0)
-        draw = ImageDraw.ImageDraw(image)
-        drawNormals = ImageDraw.ImageDraw(normalImage)
-        for z in range(map_size[0]):
-            for x in range(map_size[1]):
-                draw.point((z, x), (int(heightmap[z][x] * 255), int(heightmap[z][x] * 255), int(heightmap[z][x] * 255)))
-                o = heightmap[z][x]
-                b = o 
-                if z < terrain.mapSize - 1:
-                    b = heightmap[z + 1][x]
-                t = o 
-                if z > 0:
-                    t = heightmap[z - 1][x]
-                l = o 
-                if x > 0:
-                    l = heightmap[z][x - 1]
-                r = o
-                if x < terrain.mapSize - 1:
-                    r = heightmap[z][x + 1]
-                vecX = glm.vec3(2 , (r - l) * terrain.elevationScale, 0)
-                vecY = glm.vec3(0, (t - b) * terrain.elevationScale, -2)
-                normal = glm.normalize(glm.cross(glm.normalize(vecX), glm.normalize(vecY)))
-                drawNormals.point((z, x), (int(normal.x * 255), int(normal.y * 255), int(normal.z * 255)))
-        image.save(filename)
-        normalImage.save("height_map_normals.png")
-        print(filename, "saved")
-        return image.width, image.height

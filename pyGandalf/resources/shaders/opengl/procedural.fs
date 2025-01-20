@@ -175,16 +175,12 @@ vec4 PBR(vec3 albedo, vec3 normal, float met, float rough, float ambientOcc){
     // ambient lighting (note that the next IBL tutorial will replace 
     // this ambient lighting with environment lighting).
     vec3 ambient = vec3(0.05) * albedo * ambientOcc;
-    
     vec3 color = ambient + Lo;
-
     // HDR tonemapping
     color = color / (color + vec3(1.0));
     // gamma correct
     color = pow(color, vec3(1.0 / 2.2)); 
-
     return vec4(color, 1.0);
-
 }
 
 vec3 HeightSplattingValues(float snowHeight, float grassHeight){
@@ -272,7 +268,7 @@ void main()
     float rockBlendValue = SlopeBlending(slopeTreshold, rockBlendAmount, v_Normal.y);
 
     vec3 normal;
-    vec4 mask;
+    vec4 mask = vec4(metallic, ao, 1.0, roughness);
     vec4 albedo;
     vec4 rockA = rockColor;
     vec4 rockN = vec4(0.0);
@@ -281,7 +277,6 @@ void main()
     if(useTextures == 0){
         albedo = HeightSplatting(HeightSplatting(sandColor, grassColor, values.z), HeightSplatting(grassColor, snowColor, values.x), values.y);
         normal = v_Normal;
-        mask = vec4(metallic, ao, 1.0, roughness);
     }else{
         vec4 bombing1 = UVSBombimg1();
         vec4 bombing2 = UVSBombimg2();
@@ -300,5 +295,5 @@ void main()
     }
     albedo = HeightSplatting(rockA, albedo, rockBlendValue);
 
-    FragColor = PBR(albedo.xyz, normal, mask.r, mask.a, mask.b);
+    FragColor = PBR(albedo.xyz, normal, mask.r, mask.a, mask.g);
 }
