@@ -2,7 +2,8 @@
 
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
-layout(rgba32f) uniform image2D imgOutput;
+layout(rgba32f, binding = 0) uniform image2D imgOutput;
+layout(rgba32f, binding = 1) uniform image2D loadedHeightmap;
 
 uniform int scale = 200;
 
@@ -30,6 +31,10 @@ uniform int mapSize = 512;
 uniform int clampHeight = 0;
 uniform float minHeight = 0.0;
 uniform float maxHeight = 10.0;
+
+uniform float offsetX = 1.0;
+uniform float offsetY = 1.0;
+uniform int loaded = 0;
 
 float invLerp(float a, float b, float v){
     return ((v - a) / (b - a));
@@ -167,13 +172,24 @@ float fractalPerlinNoise(float x, float z){
 void main() {
     vec4 value = vec4(0.0, 0.0, 0.0, 1.0);
     ivec2 texelCoord = ivec2(gl_GlobalInvocationID.xy);
-
     float range = 511.0 / (mapSize - 1);
-    float height = fractalPerlinNoise(float(texelCoord.x * range + cameraCoords.x), float(texelCoord.y * range + cameraCoords.y)) / 2.0;
-	
-    value.x = height;
-    value.y = height;
-    value.z = height;
-	
+    vec2 ftexelCoord = vec2(texelCoord) * range;
+    ftexelCoord += cameraCoords;
+
+    if(loaded == 0){
+      float height = fractalPerlinNoise(ftexelCoord.x, ftexelCoord.y) / 2.0;
+    
+      value.x = height;
+      value.y = height;
+      value.z = height;
+    }else{
+      ivec2 coords = ivec2(ceil(offsetX) * texelCoord.x, ceil(offsetY) * texelCoord.y);
+      float height = imageLoad(loadedHeightmap, coords).r;
+
+      value.x = height;
+      value.y = height;
+      value.z = height;
+    }
     imageStore(imgOutput, texelCoord, value);
+
 }

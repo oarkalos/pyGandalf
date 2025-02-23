@@ -37,8 +37,9 @@ class TerrainGenerationSystem(System):
         tex_coords = []
 
         if terrain.cameraMoved:
-            transform.translation.x = terrain.cameraCoords.x
-            transform.translation.z = terrain.cameraCoords.y
+            if not terrain.erode:
+                transform.translation.x = terrain.cameraCoords.x
+                transform.translation.z = terrain.cameraCoords.y
             terrain.cameraMoved = False
 
         if terrain.generate:

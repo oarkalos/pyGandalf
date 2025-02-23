@@ -1,0 +1,103 @@
+#version 450 core
+
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+layout(rgba32f, binding = 0) uniform image2D heightmap;
+layout(rgba32f, binding = 1) uniform image2D dropsPosSpeed;
+layout(rgba32f, binding = 2) uniform image2D dropsVolSed;
+
+uniform int started;
+
+uniform float minVolume = 0.01;
+uniform float dt = 1.2;
+uniform float evaporation = 0.001;
+uniform float deposition = 0.1;
+uniform float friction = 0.05;
+uniform float density = 1.0;
+
+struct droplet{
+    vec2 position;
+    vec2 speed;
+    float volume;
+    float sediment;
+};
+
+vec3 SurfaceNormal(ivec2 coords){
+    float height = imageLoad(heightmap, coords).r;
+    float heightSE = imageLoad(heightmap, ivec2(coords.x + 1, coords.y + 1)).r;
+    float heightNE = imageLoad(heightmap, ivec2(coords.x + 1, coords.y - 1)).r;
+    float heightNW = imageLoad(heightmap, ivec2(coords.x - 1, coords.y - 1)).r;
+    float heightSW = imageLoad(heightmap, ivec2(coords.x - 1, coords.y + 1)).r;
+    float heightE = imageLoad(heightmap, ivec2(coords.x + 1, coords.y)).r;
+    float heightW = imageLoad(heightmap, ivec2(coords.x - 1, coords.y)).r;
+    float heightS = imageLoad(heightmap, ivec2(coords.x, coords.y + 1)).r;
+    float heightN = imageLoad(heightmap, ivec2(coords.x, coords.y - 1)).r;
+
+    vec3 n = vec3(0.15) * normalize(vec3(60 * (height - heightE), 1.0, 0.0));  //Positive X
+    n += vec3(0.15) * normalize(vec3(60 * (heightW - height), 1.0, 0.0));  //Negative X
+    n += vec3(0.15) * normalize(vec3(0.0, 1.0, 60 * (height - heightS)));    //Posit
+    n += vec3(0.15) * normalize(vec3(0.0, 1.0, 60 * (heightN - height)));  //Negative Y
+  
+    //Diagonals! (This removes the last spatial artifacts)
+    n += vec3(0.1) * normalize(vec3((height - heightSE) * 42.4268, 0.7071, (height - heightSE) * 42.4268));    //Positive Y
+    n += vec3(0.1) * normalize(vec3((height - heightNE) * 42.4268, 0.7071, (height - heightNE) * 42.4268));    //Positive Y
+    n += vec3(0.1) * normalize(vec3((height - heightSW) * 42.4268, 0.7071, (height - heightSW) * 42.4268));    //Positive Y
+    n += vec3(0.1) * normalize(vec3((height - heightNW) * 42.4268, 0.7071, (height - heightNW) * 42.4268));    //Positive Y
+  
+    return n;
+}
+
+void main(){
+    ivec2 texelCoord = ivec2(gl_GlobalInvocationID.xy);
+
+    vec4 previousIterPosSpeed = imageLoad(dropsPosSpeed, texelCoord);
+    vec4 previousIterVolSed = imageLoad(dropsVolSed, texelCoord);
+
+    vec2 pos = vec2(texelCoord);
+    vec2 speed = vec2(0.0);
+    float volume = 1.0;
+    float sediment = 0.0;
+
+    if(started != 0){
+        pos = previousIterPosSpeed.xy;
+        speed = previousIterPosSpeed.zw;
+        volume = previousIterVolSed.x;
+        sediment = previousIterVolSed.y;
+    }
+    
+    droplet drop = droplet(pos, speed, volume, sediment);
+    ivec2 ipos = ivec2(0.0);
+    float c_eq = 0.0;
+    vec4 height = vec4(0.0);
+
+    for(int i = 0; i < 1; i++){
+        if(drop.volume <= minVolume){
+            break;
+        }
+
+        ipos = ivec2(drop.position);
+        vec3 normal = SurfaceNormal(ipos);
+
+        drop.speed += dt * normal.xz / (drop.volume * density);
+        drop.position += dt * drop.speed;
+        drop.speed *= (1.0 - dt * friction);
+
+        if((drop.position.x < 0.0) || (drop.position.y < 0.0) || (drop.position.x > 512) || (drop.position.y > 512)){
+            break; 
+        } 
+
+        height = imageLoad(heightmap, ipos);
+
+        c_eq = max(0.0, drop.volume * length(drop.speed) * (height.r - imageLoad(heightmap, ivec2(drop.position.x, drop.position.y)).r));
+            
+        float c_diff = c_eq - drop.sediment;
+        float incSediment = dt * deposition * c_diff;
+        drop.sediment += incSediment;
+        height.r -= drop.volume * incSediment;
+            
+        drop.volume *= (1.0 - dt * evaporation);
+        imageStore(heightmap, ipos, height);
+    }
+    imageStore(dropsPosSpeed, texelCoord, vec4(drop.position.x, drop.position.y, drop.speed.x, drop.speed.y));
+    imageStore(dropsVolSed, texelCoord, vec4(drop.volume, drop.sediment, 0.0, 0.0));
+}

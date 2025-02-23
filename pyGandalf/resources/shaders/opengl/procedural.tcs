@@ -4,7 +4,7 @@ layout(vertices=4) out;
 
 uniform mat4 u_Model;
 uniform mat4 u_View;
-uniform int mapSize;
+uniform int mapSize = 512;
 
 in vec2 v_TexCoord[];
 out vec2 v_TextureCoord[];
@@ -23,10 +23,10 @@ void main()
         // ----------------------------------------------------------------------
         // Step 1: define constants to control tessellation parameters
 	    // set these as desired for your world scale
-        const int MIN_TESS_LEVEL = 1;
+        const int MIN_TESS_LEVEL = 4;
         int MAX_TESS_LEVEL = mapSize;
-        const float MIN_DISTANCE = 60;
-        const float MAX_DISTANCE = 200;
+        const float MIN_DISTANCE = 20;
+        const float MAX_DISTANCE = 700;
         float distRange = MAX_DISTANCE-MIN_DISTANCE;
         mat4 viewModel = u_View * u_Model;
 

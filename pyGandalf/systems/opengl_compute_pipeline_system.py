@@ -9,8 +9,6 @@ from pyGandalf.utilities.opengl_material_lib import MaterialInstance
 from pyGandalf.utilities.definitions import SHADERS_PATH
 import glm
 from PIL import Image, ImageDraw
-import ctypes
-import numpy as np
 
 class OpenGLComputePipelineSystem(System):
 
@@ -28,7 +26,6 @@ class OpenGLComputePipelineSystem(System):
 
         gl.glDeleteShader(compute_shader)
 
-        gl.glBindImageTexture(0, compute.textures[0], 0, gl.GL_FALSE, 0, gl.GL_READ_WRITE, gl.GL_RGBA32F)
         compute.ID = shader_program
 
         compute_params = OpenGLShaderLib().parse(computeCode)
@@ -85,20 +82,24 @@ class OpenGLComputePipelineSystem(System):
                         compute.guiData[uniformName] = GUIData(0.01, 0.0, 100.0)
                     case _:
                         compute.guiData[uniformName] = GUIData(1, 0, 1000)
+        
 
     def on_update_entity(self, ts: float, entity: Entity, components: Component | tuple[Component]):
         compute: ComputeComponent = components
 
-        gl.glUseProgram(compute.ID)
+        if compute.run:
+            gl.glUseProgram(compute.ID)
 
-        for uniformName, uniformType in compute.uniformsDictionary.items():
-            location = gl.glGetUniformLocation(compute.ID, uniformName)
-            uniformDataIndex = list(compute.uniformsDictionary.keys()).index(uniformName)
-            MaterialInstance.update_uniform(MaterialInstance, location, uniformName, compute.uniformsData[uniformDataIndex], uniformType)
+            gl.glBindImageTexture(0, compute.textures[0], 0, gl.GL_FALSE, 0, gl.GL_READ_WRITE, gl.GL_RGBA32F)
+            gl.glBindImageTexture(1, compute.textures[1], 0, gl.GL_FALSE, 0, gl.GL_READ_WRITE, gl.GL_RGBA32F)
+            for uniformName, uniformType in compute.uniformsDictionary.items():
+                location = gl.glGetUniformLocation(compute.ID, uniformName)
+                uniformDataIndex = list(compute.uniformsDictionary.keys()).index(uniformName)
+                MaterialInstance.update_uniform(MaterialInstance, location, uniformName, compute.uniformsData[uniformDataIndex], uniformType)
 
-        gl.glDispatchCompute(compute.workGroupsX, compute.workGroupsY, compute.workGroupsZ)
-        gl.glMemoryBarrier(gl.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT)
-        gl.glUseProgram(0)
+            gl.glDispatchCompute(compute.workGroupsX, compute.workGroupsY, compute.workGroupsZ)
+            gl.glMemoryBarrier(gl.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT)
+            gl.glUseProgram(0)
 
         if compute.save:
             self.export_texture("heightmap.png")

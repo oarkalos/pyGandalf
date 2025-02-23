@@ -12,8 +12,10 @@ from pyGandalf.utilities.definitions import ROOT_DIR, SCENES_PATH, MODELS_PATH, 
 from pyGandalf.utilities.entity_presets import *
 from pyGandalf.utilities.mesh_lib import MeshLib
 from pyGandalf.utilities.component_lib import ComponentLib
+from pyGandalf.utilities.opengl_texture_lib import TextureData, TextureDescriptor
 
 from pyGandalf.utilities.logger import logger
+from PIL import Image
 
 from imgui_bundle import imgui, imguizmo
 import OpenGL.GL as gl
@@ -355,7 +357,8 @@ class EditorPanelSystem(System):
                     cameraTransform: TransformComponent = SceneManager().get_active_scene().get_component(terrain.camera, TransformComponent)
                     material: MaterialComponent = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, MaterialComponent)
                     compute: ComputeComponent = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, ComputeComponent)
-                    if terrain.cameraCoords != cameraTransform.translation.xz:
+                    erosion: ErosionComponent = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, ErosionComponent)
+                    if (terrain.cameraCoords != cameraTransform.translation.xz) and not terrain.erode:
                         terrain.cameraCoords = cameraTransform.translation.xz
                         compute.uniformsData[list(compute.uniformsDictionary.keys()).index('cameraCoords')] = terrain.cameraCoords
                         terrain.cameraMoved = True
@@ -365,6 +368,27 @@ class EditorPanelSystem(System):
                     imgui.button('Generate', imgui.ImVec2(60, 15))
                     if imgui.is_item_clicked():
                         terrain.generate = True
+                        compute.run = True
+                        terrain.erode = False
+                        erosion.enabled = False
+                        compute.uniformsData[list(compute.uniformsDictionary.keys()).index('loaded')] = 0
+                    load_pressed = imgui.begin_menu('Load')
+                    if load_pressed:
+                        for file in glob.glob(str(TEXTURES_PATH/ "**")):
+                            path: Path = Path(file)
+                            file_pressed, _ = imgui.menu_item(path.name, '', False)
+                            if file_pressed:
+                                compute.run = True
+                                terrain.generate = True
+                                img = Image.open(path.absolute())
+                                width, height = img.size
+                                compute.uniformsData[list(compute.uniformsDictionary.keys()).index('offsetX')] = width / terrain.mapSize
+                                compute.uniformsData[list(compute.uniformsDictionary.keys()).index('offsetY')] = height / terrain.mapSize
+                                compute.uniformsData[list(compute.uniformsDictionary.keys()).index('loaded')] = 1
+                                terrain.erode = True
+                                computeTextureDescriptor = TextureDescriptor(internal_format=gl.GL_RGBA32F, wrap_s=gl.GL_CLAMP_TO_EDGE, wrap_t=gl.GL_CLAMP_TO_EDGE)
+                                OpenGLTextureLib().update('loadedHeightmap', TextureData(path.absolute()), computeTextureDescriptor)
+                        imgui.end_menu()
                     if scaleChanged: terrain.scale = newScale
                     if elevationScaleChanged: terrain.elevationScale = newElevationScale
                     if terrainChanged: terrain.mapSize = newMapSize
@@ -414,6 +438,27 @@ class EditorPanelSystem(System):
                     imgui.button('Save', imgui.ImVec2(60, 15))
                     if imgui.is_item_clicked():
                         compute.save = True
+
+                    imgui.tree_pop()
+                imgui.separator()
+
+            if SceneManager().get_active_scene().has_component(EditorVisibleComponent.SELECTED_ENTITY, ErosionComponent):
+                if imgui.tree_node_ex('ErosionComponent', flags):
+                    erosion: ErosionComponent = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, ErosionComponent)
+                    compute: ComputeComponent = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, ComputeComponent)
+                    terrain: TerrainComponent = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, TerrainComponent)
+
+                    rainRateChanged, newRainRate = imgui.drag_float('Rain Rate', erosion.rainRate, 0.01)
+                    evaporationChanged, newEvaporation = imgui.drag_float('Evaporation', erosion.evaporation, 0.01)
+                    imgui.button('Erode', imgui.ImVec2(60, 15))
+                    if imgui.is_item_clicked():
+                        erosion.enabled = True
+                        compute.run = False
+                        terrain.erode = True
+                        erosion.counter = 0
+                        erosion.started = 0
+                    if rainRateChanged: erosion.rainRate = newRainRate
+                    if evaporationChanged: erosion.evaporation = newEvaporation
 
                     imgui.tree_pop()
                 imgui.separator()
