@@ -435,9 +435,6 @@ class EditorPanelSystem(System):
                                         changed, newValue = imgui.combo(uniformName, int(compute.uniformsData[index]), compute.guiData[uniformName].comboValues)
                         if changed: compute.uniformsData[index] = newValue
 
-                    imgui.button('Save', imgui.ImVec2(60, 15))
-                    if imgui.is_item_clicked():
-                        compute.save = True
 
                     imgui.tree_pop()
                 imgui.separator()
@@ -448,8 +445,6 @@ class EditorPanelSystem(System):
                     compute: ComputeComponent = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, ComputeComponent)
                     terrain: TerrainComponent = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, TerrainComponent)
 
-                    rainRateChanged, newRainRate = imgui.drag_float('Rain Rate', erosion.rainRate, 0.01)
-                    evaporationChanged, newEvaporation = imgui.drag_float('Evaporation', erosion.evaporation, 0.01)
                     imgui.button('Erode', imgui.ImVec2(60, 15))
                     if imgui.is_item_clicked():
                         erosion.enabled = True
@@ -457,8 +452,9 @@ class EditorPanelSystem(System):
                         terrain.erode = True
                         erosion.counter = 0
                         erosion.started = 0
-                    if rainRateChanged: erosion.rainRate = newRainRate
-                    if evaporationChanged: erosion.evaporation = newEvaporation
+                    imgui.button('Save', imgui.ImVec2(60, 15))
+                    if imgui.is_item_clicked():
+                        erosion.save = True
 
                     imgui.tree_pop()
                 imgui.separator()

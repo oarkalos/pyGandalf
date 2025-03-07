@@ -100,21 +100,3 @@ class OpenGLComputePipelineSystem(System):
             gl.glDispatchCompute(compute.workGroupsX, compute.workGroupsY, compute.workGroupsZ)
             gl.glMemoryBarrier(gl.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT)
             gl.glUseProgram(0)
-
-        if compute.save:
-            self.export_texture("heightmap.png")
-            compute.save = False
-
-    def export_texture(self, filename):
-        gl.glBindTexture(gl.GL_TEXTURE_2D, OpenGLTextureLib().get_id("heightmap"))
-        heightmap = gl.glGetTexImage(gl.GL_TEXTURE_2D, 0, gl.GL_RGBA, gl.GL_FLOAT)
-
-        image = Image.new('RGB', (heightmap.shape[0], heightmap.shape[1]), 0)
-        draw = ImageDraw.ImageDraw(image)
-        for z in range(heightmap.shape[0]):
-            for x in range(heightmap.shape[1]):
-                draw.point((z, x), (int(heightmap[z][x][0] * 255), int(heightmap[z][x][0] * 255), int(heightmap[z][x][0] * 255)))
-        image.save(filename)
-        print(filename, "saved")
-        return image.width, image.height
-

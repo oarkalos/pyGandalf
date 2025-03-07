@@ -83,9 +83,10 @@ void main()
 
     // displace point along normal
     p += normal * height * elevationScale;
-    v_Position = p.xyz;
 
     // ----------------------------------------------------------------------
     // output patch point position in clip space
-    gl_Position = u_Projection * u_View * u_Model * p;
+    vec4 position = u_Model * p;
+    v_Position = position.xyz;
+    gl_Position = u_Projection * u_View * position;
 }

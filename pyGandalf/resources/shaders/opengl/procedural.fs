@@ -56,6 +56,8 @@ uniform vec4 snowColor;
 uniform vec4 grassColor;
 uniform vec4 sandColor;
 uniform int mapSize;
+uniform int clip = 0;
+uniform float waterPlane = 0.0;
 
 out vec4 FragColor;
 
@@ -242,6 +244,7 @@ vec2 UVSBombimgLerValue(){
 
 vec4 calculateAlbedo(vec3 values, vec2 UVS1, vec2 UVS2, vec2 UVS3, vec2 UVS4, vec2 lerpValues){
     vec4 grassColor = mix(mix(texture(grassAlbedo, UVS1), texture(grassAlbedo, UVS2), lerpValues.r), mix(texture(grassAlbedo, UVS3), texture(grassAlbedo, UVS4), lerpValues.r), lerpValues.g);
+    grassColor += vec4(0.0, 0.3, 0.0, 0.0);
     vec4 snowColor = mix(mix(texture(snowAlbedo, UVS1), texture(snowAlbedo, UVS2), lerpValues.r), mix(texture(snowAlbedo, UVS3), texture(snowAlbedo, UVS4), lerpValues.r), lerpValues.g);
     vec4 sandColor = mix(mix(texture(sandAlbedo, UVS1), texture(sandAlbedo, UVS2), lerpValues.r), mix(texture(sandAlbedo, UVS3), texture(sandAlbedo, UVS4), lerpValues.r), lerpValues.g);
     return HeightSplatting(HeightSplatting(sandColor, grassColor, values.z), HeightSplatting(grassColor, snowColor, values.x), values.y);
@@ -264,6 +267,11 @@ vec4 calculateMask(vec3 values, vec2 UVS1, vec2 UVS2, vec2 UVS3, vec2 UVS4, vec2
 
 void main()
 {
+    if((clip == 1) && (v_Position.y < waterPlane)){
+        discard;
+    }else if((clip == 2) && (v_Position.y > waterPlane)){
+        discard;
+    }
     vec3 values = HeightSplattingValues(heightOfSnow, heightOfGrass);
     float rockBlendValue = SlopeBlending(slopeTreshold, rockBlendAmount, v_Normal.y);
 

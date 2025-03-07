@@ -235,11 +235,11 @@ class MaterialData:
         self.maxHeight = 60.0
         self.heightOfSnow = 0.9
         self.heightOfGrass = 0.03
-        self.rockColor = glm.vec4(0.33, 0.33, 0.33, 1.0)
+        self.rockColor = glm.vec4(0.13, 0.13, 0.13, 1.0)
         self.rockBlendAmount = 1.14
-        self.slopeTreshold = 0.5
+        self.slopeTreshold = 0.8
         self.snowColor = glm.vec4(0.93, 0.83, 0.83, 1.0)
-        self.grassColor = glm.vec4(0.26, 0.44, 0.2, 1.0)
+        self.grassColor = glm.vec4(0.26, 0.84, 0.2, 1.0)
         self.sandColor = glm.vec4(1.0, 0.7, 0.54, 1.0)
         self.tiling = glm.ivec2(10, 10)
 

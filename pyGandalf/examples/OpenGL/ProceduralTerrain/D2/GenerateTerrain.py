@@ -10,6 +10,7 @@ from pyGandalf.systems.transform_system import TransformSystem
 from pyGandalf.systems.camera_system import CameraSystem
 from pyGandalf.systems.camera_controller_system import CameraControllerSystem
 from pyGandalf.systems.opengl_rendering_system import OpenGLStaticMeshRenderingSystem
+from pyGandalf.systems.my_opengl_rendering_system import MyOpenGLRenderingSystem
 from pyGandalf.systems.terrain_generation_system import TerrainGenerationSystem
 from pyGandalf.systems.opengl_compute_pipeline_system import OpenGLComputePipelineSystem
 from pyGandalf.systems.erosion_system import ErosionSystem
@@ -50,17 +51,18 @@ def main():
     camera = scene.enroll_entity()
     terrain = scene.enroll_entity()
     light = scene.enroll_entity()
+    sea_floor = scene.enroll_entity()
     skybox = scene.enroll_entity()
     terrainComponent = TerrainComponent(200, 25, 512, patch_resolution, vertices_per_patch, camera)
 
         # Array that holds all the cloudy skybox textures
     cloudy_skybox_textures = [
-        TEXTURES_PATH / 'skybox' / 'cloudy' / 'right.jpg',
-        TEXTURES_PATH / 'skybox' / 'cloudy' / 'left.jpg',
-        TEXTURES_PATH / 'skybox' / 'cloudy' / 'top.jpg',
-        TEXTURES_PATH / 'skybox' / 'cloudy' / 'bottom.jpg',
-        TEXTURES_PATH / 'skybox' / 'cloudy' / 'front.jpg',
-        TEXTURES_PATH / 'skybox' / 'cloudy' / 'back.jpg'
+        TEXTURES_PATH / 'skybox' / 'day_sunless' / 'right.png',
+        TEXTURES_PATH / 'skybox' / 'day_sunless' / 'left.png',
+        TEXTURES_PATH / 'skybox' / 'day_sunless' / 'top.png',
+        TEXTURES_PATH / 'skybox' / 'day_sunless' / 'bottom.png',
+        TEXTURES_PATH / 'skybox' / 'day_sunless' / 'front.png',
+        TEXTURES_PATH / 'skybox' / 'day_sunless' / 'back.png'
     ]
 
     # Vertices for the cube
@@ -78,20 +80,43 @@ def main():
         [-1.0,  1.0,  1.0], [1.0,  1.0,  1.0], [-1.0,  1.0,  1.0], [1.0, -1.0,  1.0]
     ], dtype=np.float32)
 
+    # Build shaders 
+    OpenGLShaderLib().build('water', SHADERS_PATH / 'opengl' / 'water.vs', SHADERS_PATH / 'opengl' / 'water.fs')
+
+    # Vertices of the quad
+    plane_vertices = np.array([
+        [-40.0, -40.0, 0.0], # 0 - Bottom left
+        [ 40.0, -40.0, 0.0], # 1 - Bottom right
+        [ 40.0,  40.0, 0.0], # 2 - Top right
+        [ 40.0,  40.0, 0.0], # 2 - Top right
+        [-40.0,  40.0, 0.0], # 3 - Top left
+        [-40.0, -40.0, 0.0]  # 0 - Bottom left
+    ], dtype=np.float32)
+
+    # Texture coordinates of the quad
+    texture_coords = np.array([
+        [0.0, 1.0], # 0
+        [1.0, 1.0], # 1
+        [1.0, 0.0], # 2
+        [1.0, 0.0], # 2
+        [0.0, 0.0], # 3
+        [0.0, 1.0]  # 0
+    ], dtype=np.float32)
+
     # Build shaders
     OpenGLShaderLib().build('default_tessellation', SHADERS_PATH / 'opengl' / 'procedural.vs', SHADERS_PATH / 'opengl' / 'procedural.fs', None, SHADERS_PATH / 'opengl' / 'procedural.tcs', SHADERS_PATH / 'opengl' / 'procedural.tes')
     OpenGLShaderLib().build('skybox', SHADERS_PATH / 'opengl' / 'skybox.vs', SHADERS_PATH / 'opengl' / 'skybox.fs')
     descriptor = TextureDescriptor(min_filter=gl.GL_LINEAR_MIPMAP_LINEAR)
     computeTextureDescriptor = TextureDescriptor(internal_format=gl.GL_RGBA32F, type=gl.GL_FLOAT, wrap_s=gl.GL_CLAMP_TO_EDGE, wrap_t=gl.GL_CLAMP_TO_EDGE)
-    OpenGLTextureLib().build('grassAlbedo', TextureData(TEXTURES_PATH / 'terrain' / 'Grass_A_BaseColor.png'), descriptor)
+    OpenGLTextureLib().build('grassAlbedo', TextureData(TEXTURES_PATH / 'terrain' / 'Grass_B_BaseColor.png'), descriptor)
     OpenGLTextureLib().build('snowAlbedo', TextureData(TEXTURES_PATH / 'terrain' / 'Snow_BaseColor.png'), descriptor)
     OpenGLTextureLib().build('sandAlbedo', TextureData(TEXTURES_PATH / 'terrain' / 'Sand_BaseColor.png'), descriptor)
 
-    OpenGLTextureLib().build('grassNormal', TextureData(TEXTURES_PATH / 'terrain' / 'Grass_A_Normal.png'), descriptor)
+    OpenGLTextureLib().build('grassNormal', TextureData(TEXTURES_PATH / 'terrain' / 'Grass_B_Normal.png'), descriptor)
     OpenGLTextureLib().build('snowNormal', TextureData(TEXTURES_PATH / 'terrain' / 'Snow_Normal.png'), descriptor)
     OpenGLTextureLib().build('sandNormal', TextureData(TEXTURES_PATH / 'terrain' / 'Sand_Normal.png'), descriptor)
 
-    OpenGLTextureLib().build('grassMask', TextureData(TEXTURES_PATH / 'terrain' / 'Grass_A_MaskMap.png'), descriptor)
+    OpenGLTextureLib().build('grassMask', TextureData(TEXTURES_PATH / 'terrain' / 'Grass_B_MaskMap.png'), descriptor)
     OpenGLTextureLib().build('snowMask', TextureData(TEXTURES_PATH / 'terrain' / 'Snow_MaskMap.png'), descriptor)
     OpenGLTextureLib().build('sandMask', TextureData(TEXTURES_PATH / 'terrain' / 'Sand_MaskMap.png'), descriptor)
 
@@ -105,6 +130,8 @@ def main():
     OpenGLTextureLib().build('dropsVolSed', TextureData(width=512, height=512), computeTextureDescriptor)
     OpenGLTextureLib().build('cloudy_cube_map', TextureData(cloudy_skybox_textures), descriptor=TextureDescriptor(flip=True, dimention=TextureDimension.CUBE, internal_format=gl.GL_RGB8, format=gl.GL_RGB))
 
+    OpenGLTextureLib().build('dudvMap', TextureData(TEXTURES_PATH / 'waterDUDV.png'), descriptor)
+    OpenGLTextureLib().build('normalMap', TextureData(TEXTURES_PATH / 'matchingNormalMap.png'), descriptor)
     # Build Materials
     OpenGLMaterialLib().build('M_Terrain', MaterialData('default_tessellation', ['grassAlbedo', 'snowAlbedo', 'sandAlbedo', 
                                                                                  'grassNormal', 'snowNormal', 'sandNormal', 
@@ -112,6 +139,7 @@ def main():
                                                                                  'rockAlbedo', 'rockNormal', 'rockMask', 'heightmap']), MaterialDescriptor(primitive=gl.GL_PATCHES, cull_face=gl.GL_FRONT, patch_resolution=terrainComponent.patch_resolution, vertices_per_patch=terrainComponent.vertices_per_patch))
     OpenGLMaterialLib().build('M_CloudySkybox', MaterialData('skybox', ['cloudy_cube_map']), MaterialDescriptor(cull_face=gl.GL_FRONT, depth_mask=gl.GL_FALSE))
 
+    OpenGLMaterialLib().build('M_WoodFloor', MaterialData('water', ['reflection_texture', 'refraction_texture', 'dudvMap', 'normalMap', 'depth_refraction_texture']))
 
     vertices = [[0.0, 0.0, 0.0]]
     tex_coords = [[0.0, 0.0]]
@@ -161,6 +189,13 @@ def main():
     scene.add_component(skybox, StaticMeshComponent('skybox', [verticesSkybox]))
     scene.add_component(skybox, MaterialComponent('M_CloudySkybox'))
 
+    # Register components to floor
+    scene.add_component(sea_floor, InfoComponent("sea_floor"))
+    scene.add_component(sea_floor, TransformComponent(glm.vec3(0, 2.0, 0), glm.vec3(270, 0, 0), glm.vec3(20, 20, 20)))
+    scene.add_component(sea_floor, LinkComponent(terrain))
+    scene.add_component(sea_floor, StaticMeshComponent('floor_mesh', [plane_vertices, texture_coords]))
+    scene.add_component(sea_floor, MaterialComponent('M_WoodFloor'))
+
     # Create Register systems
     scene.register_system(TransformSystem([TransformComponent]))
     scene.register_system(LinkSystem([LinkComponent, TransformComponent]))
@@ -169,7 +204,7 @@ def main():
     scene.register_system(TerrainGenerationSystem([TerrainComponent, StaticMeshComponent, TransformComponent, ComputeComponent]))
     scene.register_system(OpenGLComputePipelineSystem([ComputeComponent]))
     scene.register_system(ErosionSystem([ErosionComponent]))
-    scene.register_system(OpenGLStaticMeshRenderingSystem([StaticMeshComponent, MaterialComponent, TransformComponent]))
+    scene.register_system(MyOpenGLRenderingSystem([StaticMeshComponent, MaterialComponent, TransformComponent]))
     scene.register_system(CameraControllerSystem([CameraControllerComponent, CameraComponent, TransformComponent]))
 
     # Add scene to manager

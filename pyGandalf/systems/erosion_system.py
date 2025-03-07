@@ -7,6 +7,7 @@ from pyGandalf.utilities.opengl_texture_lib import OpenGLTextureLib
 from pyGandalf.utilities.opengl_material_lib import MaterialInstance
 from pyGandalf.utilities.definitions import SHADERS_PATH
 from PIL import Image, ImageDraw
+from os import path
 
 class ErosionSystem(System):
 
@@ -44,14 +45,19 @@ class ErosionSystem(System):
             gl.glMemoryBarrier(gl.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT)
             gl.glUseProgram(0)
 
-            if erosion.save:
-                self.export_texture("heightmap.png")
-                erosion.save = False
-
             erosion.counter += 1
             erosion.started = 1
             if erosion.counter == 500:
                 erosion.enabled = False
+
+        if erosion.save:
+            counter = 0
+            filename = "heightmap" + str(counter) + ".png"
+            while(path.isfile(path.abspath(filename))):
+                counter += 1
+                filename = "heightmap" + str(counter) + ".png"
+            self.export_texture(filename)
+            erosion.save = False
 
     def export_texture(self, filename):
         gl.glBindTexture(gl.GL_TEXTURE_2D, OpenGLTextureLib().get_id("heightmap"))
