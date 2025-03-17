@@ -4,6 +4,7 @@ layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
 layout(rgba32f, binding = 0) uniform image2D imgOutput;
 layout(rgba32f, binding = 1) uniform image2D loadedHeightmap;
+layout(rgba32f, binding = 2) uniform image2D normals;
 
 uniform int scale = 200;
 
@@ -172,24 +173,30 @@ float fractalPerlinNoise(float x, float z){
 void main() {
     vec4 value = vec4(0.0, 0.0, 0.0, 1.0);
     ivec2 texelCoord = ivec2(gl_GlobalInvocationID.xy);
-    float range = 511.0 / (mapSize - 1);
+    float range = 512.0 / mapSize;
     vec2 ftexelCoord = vec2(texelCoord) * range;
     ftexelCoord += cameraCoords;
 
-    if(loaded == 0){
-      float height = fractalPerlinNoise(ftexelCoord.x, ftexelCoord.y) / 2.0;
-    
-      value.x = height;
-      value.y = height;
-      value.z = height;
-    }else{
-      ivec2 coords = ivec2(ceil(offsetX) * texelCoord.x, ceil(offsetY) * texelCoord.y);
-      float height = imageLoad(loadedHeightmap, coords).r;
+    float height = 0.0;
 
-      value.x = height;
-      value.y = height;
-      value.z = height;
+    if(loaded == 0){
+      height = fractalPerlinNoise(ftexelCoord.x, ftexelCoord.y) / 2.0;
+    }else{
+      ivec2 coords = ivec2(ceil(offsetX) * (texelCoord.x * 512) / mapSize, ceil(offsetY) * (texelCoord.y * 512) / mapSize);
+      height = imageLoad(loadedHeightmap, coords).r;
     }
+
+    value.x = (((float(texelCoord.x)) * 175.0) / 511.0) - 100.0;
+    value.y = height;
+    value.z = (((float(texelCoord.y)) * 175.0) / 511.0) - 100.0;
     imageStore(imgOutput, texelCoord, value);
 
+    float heightR = imageLoad(imgOutput, ivec2(texelCoord.x + 1, texelCoord.y)).y;
+    float heightL = imageLoad(imgOutput, ivec2(texelCoord.x - 1, texelCoord.y)).y;
+    float heightB = imageLoad(imgOutput, ivec2(texelCoord.x, texelCoord.y + 1)).y;
+    float heightT = imageLoad(imgOutput, ivec2(texelCoord.x, texelCoord.y - 1)).y;
+
+    vec3 vecX = vec3(2, (heightR - heightL) * 40, 0);
+    vec3 vecY = vec3(0, (heightT - heightB) * 40, -2);
+    imageStore(normals, texelCoord, vec4(normalize(cross(vecX, vecY)), 1.0));
 }

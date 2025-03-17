@@ -92,6 +92,7 @@ class OpenGLComputePipelineSystem(System):
 
             gl.glBindImageTexture(0, compute.textures[0], 0, gl.GL_FALSE, 0, gl.GL_READ_WRITE, gl.GL_RGBA32F)
             gl.glBindImageTexture(1, compute.textures[1], 0, gl.GL_FALSE, 0, gl.GL_READ_WRITE, gl.GL_RGBA32F)
+            gl.glBindImageTexture(2, compute.textures[2], 0, gl.GL_FALSE, 0, gl.GL_READ_WRITE, gl.GL_RGBA32F)
             for uniformName, uniformType in compute.uniformsDictionary.items():
                 location = gl.glGetUniformLocation(compute.ID, uniformName)
                 uniformDataIndex = list(compute.uniformsDictionary.keys()).index(uniformName)

@@ -12,8 +12,10 @@ uniform int elevationScale;
 
 uniform int mapSize;
 uniform ivec2 tiling;
+uniform int generate = 1;
 
 uniform sampler2D imgOutput;
+uniform sampler2D normals;
 
 out float height;
 
@@ -67,19 +69,24 @@ void main()
     vec2 heightMapCoords = texCoord;
     heightMapCoords.x = (float(mapSize) / 64.0) * texCoord.x;
     heightMapCoords.y = (float(mapSize) / 64.0) * texCoord.y;
-    height = texture(imgOutput, heightMapCoords).r;
-    float heightR = texture(imgOutput, vec2(heightMapCoords.x + 1.0/mapSize, heightMapCoords.y)).r;
-    float heightB = texture(imgOutput, vec2(heightMapCoords.x, heightMapCoords.y + 1.0/mapSize)).r;
-    float heightT = texture(imgOutput, vec2(heightMapCoords.x, heightMapCoords.y - 1.0/mapSize)).r;
-    float heightL = texture(imgOutput, vec2(heightMapCoords.x - 1.0/mapSize, heightMapCoords.y)).r;
+    height = texture(imgOutput, heightMapCoords).y;
+
+    if(generate == 1){
+        float heightR = texture(imgOutput, vec2(heightMapCoords.x + 1.0/mapSize, heightMapCoords.y)).y;
+        float heightB = texture(imgOutput, vec2(heightMapCoords.x, heightMapCoords.y + 1.0/mapSize)).y;
+        float heightT = texture(imgOutput, vec2(heightMapCoords.x, heightMapCoords.y - 1.0/mapSize)).y;
+        float heightL = texture(imgOutput, vec2(heightMapCoords.x - 1.0/mapSize, heightMapCoords.y)).y;
+
+        vec3 vecX = vec3(2, (heightR - heightL) * elevationScale, 0);
+        vec3 vecY = vec3(0, (heightT - heightB) * elevationScale, -2);
+        v_Normal = normalize(cross(vecX, vecY));
+    }else{
+        v_Normal = texture(normals, heightMapCoords).xyz;
+    }
     
     texCoord.x += invLerp(0.0, 512.0, cameraCoords.x);
     texCoord.y += invLerp(0.0, 512.0, cameraCoords.y);
     v_TexCoord = texCoord * tiling;
-
-    vec3 vecX = vec3(2, (heightR - heightL) * elevationScale, 0);
-    vec3 vecY = vec3(0, (heightT - heightB) * elevationScale, -2);
-    v_Normal = normalize(cross(vecX, vecY));
 
     // displace point along normal
     p += normal * height * elevationScale;

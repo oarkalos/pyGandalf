@@ -455,6 +455,9 @@ class MyOpenGLRenderingSystem(System):
         if material.instance.has_uniform('roughness'):
             material.instance.set_uniform('roughness', material.instance.data.roughness)
 
+        if material.instance.has_uniform('generate'):
+            material.instance.set_uniform('generate', material.instance.data.generate)
+
         if material.instance.has_uniform('ao'):
             material.instance.set_uniform('ao', material.instance.data.ao)
 

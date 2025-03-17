@@ -225,6 +225,7 @@ class MaterialData:
         self.glossiness = glossiness
         self.scale = 200
         self.elevationScale = 10.0
+        self.generate = 1
         self.mapSize = 2
         self.cameraCoords = glm.vec2(0.0, 0.0)
         self.metallic = 0.0

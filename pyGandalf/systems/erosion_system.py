@@ -36,6 +36,7 @@ class ErosionSystem(System):
             gl.glBindImageTexture(0, erosion.heightmapId, 0, gl.GL_FALSE, 0, gl.GL_READ_WRITE, gl.GL_RGBA32F)
             gl.glBindImageTexture(1, erosion.dropsPosSpeedId, 0, gl.GL_FALSE, 0, gl.GL_READ_WRITE, gl.GL_RGBA32F)
             gl.glBindImageTexture(2, erosion.dropsVolSedId, 0, gl.GL_FALSE, 0, gl.GL_READ_WRITE, gl.GL_RGBA32F)
+            gl.glBindImageTexture(3, erosion.normalsId, 0, gl.GL_FALSE, 0, gl.GL_READ_WRITE, gl.GL_RGBA32F)
 
             gl.glUseProgram(erosion.erosionId)
             location = gl.glGetUniformLocation(erosion.erosionId, 'started')
@@ -59,15 +60,15 @@ class ErosionSystem(System):
             self.export_texture(filename)
             erosion.save = False
 
-    def export_texture(self, filename):
-        gl.glBindTexture(gl.GL_TEXTURE_2D, OpenGLTextureLib().get_id("heightmap"))
+    def export_texture(self, filename, textureName: str = "heightmap"):
+        gl.glBindTexture(gl.GL_TEXTURE_2D, OpenGLTextureLib().get_id(textureName))
         heightmap = gl.glGetTexImage(gl.GL_TEXTURE_2D, 0, gl.GL_RGBA, gl.GL_FLOAT)
 
         image = Image.new('RGB', (heightmap.shape[0], heightmap.shape[1]), 0)
         draw = ImageDraw.ImageDraw(image)
         for z in range(heightmap.shape[0]):
             for x in range(heightmap.shape[1]):
-                draw.point((z, x), (int(heightmap[z][x][0] * 255), int(heightmap[z][x][0] * 255), int(heightmap[z][x][0] * 255)))
+                draw.point((z, x), (int(heightmap[z][x][1] * 255), int(heightmap[z][x][1] * 255), int(heightmap[z][x][1] * 255)))
         image.save(filename)
         print(filename, "saved")
         return image.width, image.height

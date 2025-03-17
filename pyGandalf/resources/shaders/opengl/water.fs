@@ -24,6 +24,10 @@ const float waveStrength = 0.03;
 const float shineDamper = 8.0;
 const float reflectivity = 0.3;
 
+float invLerp(float a, float b, float v){
+    return ((v - a) / (b - a));
+}
+
 void main(){
     vec2 normalizedDeviceCoords = ((clipSpace.xy/clipSpace.w) / 2.0) + 0.5;
     vec2 refractionCoords = vec2(normalizedDeviceCoords.x, normalizedDeviceCoords.y);
@@ -69,7 +73,11 @@ void main(){
     specular = pow(specular, shineDamper);
     vec3 specularHighlights = u_LightColors[0] * specular * reflectivity * smoothFactor;
 
+    float edgeFactor = clamp(smoothFactor, 0.0, 0.1);
+    edgeFactor = invLerp(0.0, 0.1, edgeFactor);
+
     color = mix(reflectionColor, refractionColor, fresnelFactor);
     color = mix(color, vec4(0.0, 0.3, 0.5, 1.0), 0.3) + vec4(specularHighlights, 0.0);
+    color = mix(vec4(1.0, 1.0, 1.0, 1.0), color, edgeFactor);
     color.a = clamp(waterDepth / 5.0, 0.0, 1.0);
 }

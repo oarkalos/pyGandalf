@@ -103,9 +103,6 @@ def main():
         [0.0, 1.0]  # 0
     ], dtype=np.float32)
 
-    # Build shaders
-    OpenGLShaderLib().build('default_tessellation', SHADERS_PATH / 'opengl' / 'procedural.vs', SHADERS_PATH / 'opengl' / 'procedural.fs', None, SHADERS_PATH / 'opengl' / 'procedural.tcs', SHADERS_PATH / 'opengl' / 'procedural.tes')
-    OpenGLShaderLib().build('skybox', SHADERS_PATH / 'opengl' / 'skybox.vs', SHADERS_PATH / 'opengl' / 'skybox.fs')
     descriptor = TextureDescriptor(min_filter=gl.GL_LINEAR_MIPMAP_LINEAR)
     computeTextureDescriptor = TextureDescriptor(internal_format=gl.GL_RGBA32F, type=gl.GL_FLOAT, wrap_s=gl.GL_CLAMP_TO_EDGE, wrap_t=gl.GL_CLAMP_TO_EDGE)
     OpenGLTextureLib().build('grassAlbedo', TextureData(TEXTURES_PATH / 'terrain' / 'Grass_B_BaseColor.png'), descriptor)
@@ -128,15 +125,20 @@ def main():
     OpenGLTextureLib().build('loadedHeightmap', TextureData(width=512, height=512), computeTextureDescriptor)
     OpenGLTextureLib().build('dropsPosSpeed', TextureData(width=512, height=512), computeTextureDescriptor)
     OpenGLTextureLib().build('dropsVolSed', TextureData(width=512, height=512), computeTextureDescriptor)
+    OpenGLTextureLib().build('normals', TextureData(width=512, height=512), computeTextureDescriptor)
     OpenGLTextureLib().build('cloudy_cube_map', TextureData(cloudy_skybox_textures), descriptor=TextureDescriptor(flip=True, dimention=TextureDimension.CUBE, internal_format=gl.GL_RGB8, format=gl.GL_RGB))
 
     OpenGLTextureLib().build('dudvMap', TextureData(TEXTURES_PATH / 'waterDUDV.png'), descriptor)
-    OpenGLTextureLib().build('normalMap', TextureData(TEXTURES_PATH / 'matchingNormalMap.png'), descriptor)
+    OpenGLTextureLib().build('normalMap', TextureData(TEXTURES_PATH / 'normal.png'), descriptor)
+
+    # Build shaders
+    OpenGLShaderLib().build('default_tessellation', SHADERS_PATH / 'opengl' / 'procedural.vs', SHADERS_PATH / 'opengl' / 'procedural.fs', None, SHADERS_PATH / 'opengl' / 'procedural.tcs', SHADERS_PATH / 'opengl' / 'procedural.tes')
+    OpenGLShaderLib().build('skybox', SHADERS_PATH / 'opengl' / 'skybox.vs', SHADERS_PATH / 'opengl' / 'skybox.fs')
     # Build Materials
     OpenGLMaterialLib().build('M_Terrain', MaterialData('default_tessellation', ['grassAlbedo', 'snowAlbedo', 'sandAlbedo', 
                                                                                  'grassNormal', 'snowNormal', 'sandNormal', 
                                                                                  'grassMask', 'snowMask', 'sandMask', 
-                                                                                 'rockAlbedo', 'rockNormal', 'rockMask', 'heightmap']), MaterialDescriptor(primitive=gl.GL_PATCHES, cull_face=gl.GL_FRONT, patch_resolution=terrainComponent.patch_resolution, vertices_per_patch=terrainComponent.vertices_per_patch))
+                                                                                 'rockAlbedo', 'rockNormal', 'rockMask', 'heightmap', 'normals']), MaterialDescriptor(primitive=gl.GL_PATCHES, cull_face=gl.GL_FRONT, patch_resolution=terrainComponent.patch_resolution, vertices_per_patch=terrainComponent.vertices_per_patch))
     OpenGLMaterialLib().build('M_CloudySkybox', MaterialData('skybox', ['cloudy_cube_map']), MaterialDescriptor(cull_face=gl.GL_FRONT, depth_mask=gl.GL_FALSE))
 
     OpenGLMaterialLib().build('M_WoodFloor', MaterialData('water', ['reflection_texture', 'refraction_texture', 'dudvMap', 'normalMap', 'depth_refraction_texture']))
@@ -159,15 +161,16 @@ def main():
     scene.add_component(terrain, StaticMeshComponent('terrain_mesh', attributes=[vertices, tex_coords]))
     scene.add_component(terrain, MaterialComponent('M_Terrain'))
     scene.add_component(terrain, terrainComponent)
-    scene.add_component(terrain, ComputeComponent(SHADERS_PATH / 'opengl' / 'heightmap.compute', [OpenGLTextureLib().get_id('heightmap'), OpenGLTextureLib().get_id('loadedHeightmap')], 
-                    512, 512, 1, [0, 0, 200, 0.2, 2.0, 0.5, 12, 1, 1, 1, 33, 0, 0, 0.2, 2.2, 0.4, 0, glm.vec2(0.0, 0.0), 256, 0, 0.0, 10.0, 1.0, 1.0, 0],
-                    {'turbulance': GUIData(type=GUIType.CHECKBOX), 'fallOffEnabled': GUIData(type=GUIType.CHECKBOX), 
+    scene.add_component(terrain, ComputeComponent(SHADERS_PATH / 'opengl' / 'heightmap.compute', 
+                                                  [OpenGLTextureLib().get_id('heightmap'), OpenGLTextureLib().get_id('loadedHeightmap'), OpenGLTextureLib().get_id('normals')], 
+                    512, 512, 1, [0, 0, 0, 200, 0.2, 2.0, 0.5, 12, 1, 1, 1, 33, 0, 0, 0.2, 2.2, 0.4, 0, glm.vec2(0.0, 0.0), 512, 0, 0.0, 10.0, 1.0, 1.0, 0],
+                    {'turbulance': GUIData(type=GUIType.CHECKBOX), 'fallOffEnabled': GUIData(type=GUIType.CHECKBOX), 'fallOffHeight': GUIData(speed=0.01, min=-2.0, max=100.0),
                      'Ridges': GUIData(type=GUIType.CHECKBOX), 'fallOffType': GUIData(type=GUIType.COMBO, comboValues=['Circle', 'Rectangle']),
                      'underWaterRavines': GUIData(type=GUIType.CHECKBOX), 'mapSize': GUIData(hidden=True), 'clampHeight': GUIData(type=GUIType.CHECKBOX),
                      'minHeight': GUIData(speed=0.01, min=-2.0, max=100.0), 'offsetX': GUIData(hidden=True), 'offsetY': GUIData(hidden=True),
                      'loaded': GUIData(hidden=True)}))
     scene.add_component(terrain, ErosionComponent(512, 512, OpenGLTextureLib().get_id('heightmap'), 
-                                                  OpenGLTextureLib().get_id('dropsPosSpeed'), OpenGLTextureLib().get_id('dropsVolSed')))
+                                                  OpenGLTextureLib().get_id('dropsPosSpeed'), OpenGLTextureLib().get_id('dropsVolSed'), OpenGLTextureLib().get_id('normals')))
 
     # Register components to camera
     scene.add_component(camera, InfoComponent("camera"))

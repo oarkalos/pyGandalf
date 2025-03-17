@@ -396,10 +396,13 @@ class EditorPanelSystem(System):
                         material.instance.data.scale = terrain.scale
                     if material.instance.has_uniform('elevationScale'):
                         material.instance.data.elevationScale = terrain.elevationScale
-                    if material.instance.has_uniform('mapSize'):
-                        material.instance.data.mapSize = terrain.mapSize / 8
+                    if compute.run:
+                        if material.instance.has_uniform('mapSize'):
+                            material.instance.data.mapSize = terrain.mapSize / 8
                     if material.instance.has_uniform('cameraCoords'):
                         material.instance.data.cameraCoords = terrain.cameraCoords
+                    if material.instance.has_uniform('generate'):
+                        material.instance.data.generate = compute.run
                     
                     imgui.tree_pop()
                 imgui.separator()

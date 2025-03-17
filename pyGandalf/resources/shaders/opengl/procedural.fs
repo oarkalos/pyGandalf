@@ -55,7 +55,6 @@ uniform float slopeTreshold;
 uniform vec4 snowColor;
 uniform vec4 grassColor;
 uniform vec4 sandColor;
-uniform int mapSize;
 uniform int clip = 0;
 uniform float waterPlane = 0.0;
 

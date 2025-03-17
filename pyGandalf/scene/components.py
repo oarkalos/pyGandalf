@@ -184,13 +184,14 @@ class ComputeComponent(Component):
         self.run = False
 
 class ErosionComponent(Component):
-    def __init__(self, width, height, heightmap, dropsPosSpeed, dropsVolSed):
+    def __init__(self, width, height, heightmap, dropsPosSpeed, dropsVolSed, normals):
         self.width = width
         self.height = height
 
         self.heightmapId = heightmap
         self.dropsPosSpeedId = dropsPosSpeed
         self.dropsVolSedId = dropsVolSed
+        self.normalsId = normals
 
         #Compute shaders ids
         self.erosionId: int = 0
