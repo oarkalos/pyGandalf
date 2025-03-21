@@ -356,11 +356,9 @@ class EditorPanelSystem(System):
                     terrain: TerrainComponent = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, TerrainComponent)
                     cameraTransform: TransformComponent = SceneManager().get_active_scene().get_component(terrain.camera, TransformComponent)
                     material: MaterialComponent = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, MaterialComponent)
-                    compute: ComputeComponent = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, ComputeComponent)
                     erosion: ErosionComponent = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, ErosionComponent)
                     if (terrain.cameraCoords != cameraTransform.translation.xz) and not terrain.erode:
                         terrain.cameraCoords = cameraTransform.translation.xz
-                        compute.uniformsData[list(compute.uniformsDictionary.keys()).index('cameraCoords')] = terrain.cameraCoords
                         terrain.cameraMoved = True
                     scaleChanged, newScale = imgui.input_int('Scale', terrain.scale, 1)
                     elevationScaleChanged, newElevationScale = imgui.input_int('Elevation Scale', terrain.elevationScale, 1)
@@ -368,27 +366,62 @@ class EditorPanelSystem(System):
                     imgui.button('Generate', imgui.ImVec2(60, 15))
                     if imgui.is_item_clicked():
                         terrain.generate = True
-                        compute.run = True
+                        terrain.run = True
                         terrain.erode = False
                         erosion.enabled = False
-                        compute.uniformsData[list(compute.uniformsDictionary.keys()).index('loaded')] = 0
+                        terrain.loaded = 0
                     load_pressed = imgui.begin_menu('Load')
                     if load_pressed:
                         for file in glob.glob(str(TEXTURES_PATH/ "**")):
                             path: Path = Path(file)
                             file_pressed, _ = imgui.menu_item(path.name, '', False)
                             if file_pressed:
-                                compute.run = True
+                                terrain.run = True
                                 terrain.generate = True
                                 img = Image.open(path.absolute())
                                 width, height = img.size
-                                compute.uniformsData[list(compute.uniformsDictionary.keys()).index('offsetX')] = width / terrain.mapSize
-                                compute.uniformsData[list(compute.uniformsDictionary.keys()).index('offsetY')] = height / terrain.mapSize
-                                compute.uniformsData[list(compute.uniformsDictionary.keys()).index('loaded')] = 1
+                                terrain.offsetX = width / terrain.mapSize
+                                terrain.offsetY = height / terrain.mapSize
+                                terrain.loaded = 1
                                 terrain.erode = True
                                 computeTextureDescriptor = TextureDescriptor(internal_format=gl.GL_RGBA32F, wrap_s=gl.GL_CLAMP_TO_EDGE, wrap_t=gl.GL_CLAMP_TO_EDGE)
                                 OpenGLTextureLib().update('loadedHeightmap', TextureData(path.absolute()), computeTextureDescriptor)
                         imgui.end_menu()
+                    frequencyChnaged, newFrequency = imgui.drag_float('Frequency', terrain.frequency, 0.01, 0.0, 1000.0)
+                    if frequencyChnaged: terrain.frequency = newFrequency
+                    lacunarityChanged, newLacunarity = imgui.drag_float('Lacunarity', terrain.lacunarity, 0.01, 0.0, 1000.0)
+                    if lacunarityChanged: terrain.lacunarity = newLacunarity
+                    persistenceChanged, newPersistence = imgui.drag_float('Persistence', terrain.persistence, 0.01, 0.0, 1000.0)
+                    if persistenceChanged: terrain.persistence = newPersistence
+                    octavesChanged, newOctaves = imgui.input_int('Octaves', terrain.octaves, 1)
+                    if octavesChanged: terrain.octaves = newOctaves
+                    turbulanceChanged, newTurbulance = imgui.checkbox('Turbulance', terrain.turbulance)
+                    if turbulanceChanged: terrain.turbulance = newTurbulance
+                    ridgesChanged, newRidges = imgui.checkbox('Ridges', terrain.Ridges)
+                    if ridgesChanged: terrain.Ridges = newRidges
+                    ridgesStrengthChanged, newRidgesStrength = imgui.slider_int('Ridges Strength', terrain.ridgesStrength, 0, 5)
+                    if ridgesStrengthChanged: terrain.ridgesStrength = newRidgesStrength
+                    seedChanged, newSeed = imgui.drag_int('Seed', terrain.seed, 1)
+                    if seedChanged: terrain.seed = newSeed
+                    fallOffEnabledChanged, newFallOffEnabled = imgui.checkbox('Fall Off Enabled', terrain.fallOffEnabled)
+                    if fallOffEnabledChanged: terrain.fallOffEnabled = newFallOffEnabled
+                    fallOffTypeChanged, newFallOffType = imgui.combo('Fall Off Type', terrain.fallOffType, ['Circle', 'Rectangle'])
+                    if fallOffTypeChanged: terrain.fallOffType = newFallOffType
+                    fallOffHeightChanged, newFallOffHeight = imgui.drag_float('Fall Off Height', terrain.fallOffHeight, 0.01)
+                    if fallOffHeightChanged: terrain.fallOffHeight = newFallOffHeight
+                    aChanged, newA = imgui.drag_float('A', terrain.a, 0.01)
+                    if aChanged: terrain.a = newA
+                    bChanged, newB = imgui.drag_float('B', terrain.b, 0.01)
+                    if bChanged: terrain.b = newB
+                    underWaterRavinesChanged, newUnderWaterRavines = imgui.checkbox('Under Water Ravines', terrain.underWaterRavines)
+                    if underWaterRavinesChanged: terrain.underWaterRavines = newUnderWaterRavines
+                    clampHeightChanged, newClampHeight = imgui.checkbox('Clamp Height', terrain.clampHeight)
+                    if clampHeightChanged: terrain.clampHeight = newClampHeight
+                    minHeightChanged, newMinHeight = imgui.drag_float('Min Height', terrain.minHeight, 0.01)
+                    if minHeightChanged: terrain.minHeight = newMinHeight
+                    maxHeightChanged, newMaxHeight = imgui.drag_float('Max Height', terrain.maxHeight, 0.01)
+                    if maxHeightChanged: terrain.maxHeight = newMaxHeight
+
                     if scaleChanged: terrain.scale = newScale
                     if elevationScaleChanged: terrain.elevationScale = newElevationScale
                     if terrainChanged: terrain.mapSize = newMapSize
@@ -396,62 +429,25 @@ class EditorPanelSystem(System):
                         material.instance.data.scale = terrain.scale
                     if material.instance.has_uniform('elevationScale'):
                         material.instance.data.elevationScale = terrain.elevationScale
-                    if compute.run:
-                        if material.instance.has_uniform('mapSize'):
-                            material.instance.data.mapSize = terrain.mapSize / 8
+                    if material.instance.has_uniform('mapSize'):
+                        material.instance.data.mapSize = terrain.mapSize / 8
                     if material.instance.has_uniform('cameraCoords'):
                         material.instance.data.cameraCoords = terrain.cameraCoords
                     if material.instance.has_uniform('generate'):
-                        material.instance.data.generate = compute.run
+                        material.instance.data.generate = terrain.run
                     
-                    imgui.tree_pop()
-                imgui.separator()
-
-            if SceneManager().get_active_scene().has_component(EditorVisibleComponent.SELECTED_ENTITY, ComputeComponent):
-                if imgui.tree_node_ex('ComputeComponent', flags):
-                    compute: ComputeComponent = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, ComputeComponent)
-
-                    for uniformName, uniformType in compute.uniformsDictionary.items():
-                        if compute.guiData[uniformName].hidden: continue
-                        index = list(compute.uniformsDictionary.keys()).index(uniformName)
-                        changed, newValue = (0, 0)
-                        match uniformType:
-                            case 'float':
-                                match compute.guiData[uniformName].type:
-                                    case GUIType.DRAG:    
-                                        changed, newValue = imgui.drag_float(uniformName, compute.uniformsData[index], compute.guiData[uniformName].speed, compute.guiData[uniformName].min, compute.guiData[uniformName].max)
-                                    case GUIType.INPUT:
-                                        changed, newValue = imgui.input_float(uniformName, compute.uniformsData[index], compute.guiData[uniformName].speed)
-                                    case GUIType.CHECKBOX:
-                                        changed, newValue = imgui.checkbox(uniformName, compute.uniformsData[index])
-                                    case GUIType.COMBO:
-                                        changed, newValue = imgui.combo(uniformName, int(compute.uniformsData[index]), compute.guiData[uniformName].comboValues)
-                            case 'int':
-                                match compute.guiData[uniformName].type:
-                                    case GUIType.DRAG:    
-                                        changed, newValue = imgui.drag_int(uniformName, compute.uniformsData[index], compute.guiData[uniformName].speed, compute.guiData[uniformName].min, compute.guiData[uniformName].max)
-                                    case GUIType.INPUT:
-                                        changed, newValue = imgui.input_int(uniformName, compute.uniformsData[index], compute.guiData[uniformName].speed)
-                                    case GUIType.CHECKBOX:
-                                        changed, newValue = imgui.checkbox(uniformName, compute.uniformsData[index])
-                                    case GUIType.COMBO:
-                                        changed, newValue = imgui.combo(uniformName, int(compute.uniformsData[index]), compute.guiData[uniformName].comboValues)
-                        if changed: compute.uniformsData[index] = newValue
-
-
                     imgui.tree_pop()
                 imgui.separator()
 
             if SceneManager().get_active_scene().has_component(EditorVisibleComponent.SELECTED_ENTITY, ErosionComponent):
                 if imgui.tree_node_ex('ErosionComponent', flags):
                     erosion: ErosionComponent = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, ErosionComponent)
-                    compute: ComputeComponent = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, ComputeComponent)
                     terrain: TerrainComponent = SceneManager().get_active_scene().get_component(EditorVisibleComponent.SELECTED_ENTITY, TerrainComponent)
 
                     imgui.button('Erode', imgui.ImVec2(60, 15))
                     if imgui.is_item_clicked():
                         erosion.enabled = True
-                        compute.run = False
+                        terrain.run = False
                         terrain.erode = True
                         erosion.counter = 0
                         erosion.started = 0

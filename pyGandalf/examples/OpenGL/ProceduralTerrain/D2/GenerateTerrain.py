@@ -9,10 +9,8 @@ from pyGandalf.systems.light_system import LightSystem
 from pyGandalf.systems.transform_system import TransformSystem
 from pyGandalf.systems.camera_system import CameraSystem
 from pyGandalf.systems.camera_controller_system import CameraControllerSystem
-from pyGandalf.systems.opengl_rendering_system import OpenGLStaticMeshRenderingSystem
 from pyGandalf.systems.my_opengl_rendering_system import MyOpenGLRenderingSystem
 from pyGandalf.systems.terrain_generation_system import TerrainGenerationSystem
-from pyGandalf.systems.opengl_compute_pipeline_system import OpenGLComputePipelineSystem
 from pyGandalf.systems.erosion_system import ErosionSystem
 
 from pyGandalf.renderer.opengl_renderer import OpenGLRenderer
@@ -53,7 +51,6 @@ def main():
     light = scene.enroll_entity()
     sea_floor = scene.enroll_entity()
     skybox = scene.enroll_entity()
-    terrainComponent = TerrainComponent(200, 25, 512, patch_resolution, vertices_per_patch, camera)
 
         # Array that holds all the cloudy skybox textures
     cloudy_skybox_textures = [
@@ -131,6 +128,9 @@ def main():
     OpenGLTextureLib().build('dudvMap', TextureData(TEXTURES_PATH / 'waterDUDV.png'), descriptor)
     OpenGLTextureLib().build('normalMap', TextureData(TEXTURES_PATH / 'normal.png'), descriptor)
 
+    terrainComponent = TerrainComponent(200, 25, 512, patch_resolution, vertices_per_patch,SHADERS_PATH / 'opengl' / 'heightmap.compute', 
+                                    [OpenGLTextureLib().get_id('heightmap'), OpenGLTextureLib().get_id('loadedHeightmap'), OpenGLTextureLib().get_id('normals')], 
+                    512, 512, 1, camera)
     # Build shaders
     OpenGLShaderLib().build('default_tessellation', SHADERS_PATH / 'opengl' / 'procedural.vs', SHADERS_PATH / 'opengl' / 'procedural.fs', None, SHADERS_PATH / 'opengl' / 'procedural.tcs', SHADERS_PATH / 'opengl' / 'procedural.tes')
     OpenGLShaderLib().build('skybox', SHADERS_PATH / 'opengl' / 'skybox.vs', SHADERS_PATH / 'opengl' / 'skybox.fs')
@@ -161,14 +161,6 @@ def main():
     scene.add_component(terrain, StaticMeshComponent('terrain_mesh', attributes=[vertices, tex_coords]))
     scene.add_component(terrain, MaterialComponent('M_Terrain'))
     scene.add_component(terrain, terrainComponent)
-    scene.add_component(terrain, ComputeComponent(SHADERS_PATH / 'opengl' / 'heightmap.compute', 
-                                                  [OpenGLTextureLib().get_id('heightmap'), OpenGLTextureLib().get_id('loadedHeightmap'), OpenGLTextureLib().get_id('normals')], 
-                    512, 512, 1, [0, 0, 0, 200, 0.2, 2.0, 0.5, 12, 1, 1, 1, 33, 0, 0, 0.2, 2.2, 0.4, 0, glm.vec2(0.0, 0.0), 512, 0, 0.0, 10.0, 1.0, 1.0, 0],
-                    {'turbulance': GUIData(type=GUIType.CHECKBOX), 'fallOffEnabled': GUIData(type=GUIType.CHECKBOX), 'fallOffHeight': GUIData(speed=0.01, min=-2.0, max=100.0),
-                     'Ridges': GUIData(type=GUIType.CHECKBOX), 'fallOffType': GUIData(type=GUIType.COMBO, comboValues=['Circle', 'Rectangle']),
-                     'underWaterRavines': GUIData(type=GUIType.CHECKBOX), 'mapSize': GUIData(hidden=True), 'clampHeight': GUIData(type=GUIType.CHECKBOX),
-                     'minHeight': GUIData(speed=0.01, min=-2.0, max=100.0), 'offsetX': GUIData(hidden=True), 'offsetY': GUIData(hidden=True),
-                     'loaded': GUIData(hidden=True)}))
     scene.add_component(terrain, ErosionComponent(512, 512, OpenGLTextureLib().get_id('heightmap'), 
                                                   OpenGLTextureLib().get_id('dropsPosSpeed'), OpenGLTextureLib().get_id('dropsVolSed'), OpenGLTextureLib().get_id('normals')))
 
@@ -204,8 +196,7 @@ def main():
     scene.register_system(LinkSystem([LinkComponent, TransformComponent]))
     scene.register_system(CameraSystem([CameraComponent, TransformComponent]))
     scene.register_system(LightSystem([LightComponent, TransformComponent]))
-    scene.register_system(TerrainGenerationSystem([TerrainComponent, StaticMeshComponent, TransformComponent, ComputeComponent]))
-    scene.register_system(OpenGLComputePipelineSystem([ComputeComponent]))
+    scene.register_system(TerrainGenerationSystem([TerrainComponent, StaticMeshComponent, TransformComponent]))
     scene.register_system(ErosionSystem([ErosionComponent]))
     scene.register_system(MyOpenGLRenderingSystem([StaticMeshComponent, MaterialComponent, TransformComponent]))
     scene.register_system(CameraControllerSystem([CameraControllerComponent, CameraComponent, TransformComponent]))

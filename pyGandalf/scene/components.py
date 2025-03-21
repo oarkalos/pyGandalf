@@ -127,7 +127,7 @@ class WebGPUComputeComponent(Component):
         self.dispatch = False
 
 class TerrainComponent(Component):
-    def __init__(self, scale, elevationScale, mapSize, patch_resolution, vertices_per_patch, camera = None):
+    def __init__(self, scale, elevationScale, mapSize, patch_resolution, vertices_per_patch, compute_shader: str, textures: list[int], x: int, y: int, z: int, camera = None):
         self.minHeight = 0.0
         self.maxHeight = 0.0
         self.scale : float = scale
@@ -148,34 +148,40 @@ class TerrainComponent(Component):
         self.heights = []
         self.vertices = []
         self.indices = []
-
-from enum import Enum
-
-class GUIType(Enum):
-    DRAG = 0
-    INPUT = 1
-    CHECKBOX = 2
-    COMBO = 3
-
-class GUIData:
-    def __init__(self, speed = 0, min = 0, max = 0, type: GUIType = GUIType.DRAG, comboValues = ['', ''], hidden = False):
-        self.speed = speed
-        self.min = min
-        self.max = max
-        self.type = type
-        self.comboValues = comboValues
-        self.hidden = hidden
-
-class ComputeComponent(Component):
-    def __init__(self, compute_shader: str, textures: list[int], x: int, y: int, z: int, uniformsData = [], guiData: dict[str, GUIData] = {}):
         self.shader: str = compute_shader
         self.textures: list[int] = textures
         self.dispatch = False
 
         self.ID: int = 0
         self.uniformsDictionary: dict[str, str] = {}
-        self.uniformsData = uniformsData
-        self.guiData: dict[str, GUIData] = guiData
+
+        #Noise settings
+        self.frequency = 0.1
+        self.lacunarity = 2.0
+        self.persistence = 0.5
+        self.octaves = 12
+        self.turbulance = 1
+        self.Ridges = 1
+        self.ridgesStrength = 2
+        self.seed = 0
+
+        #Fall off settings
+        self.fallOffEnabled = 0
+        self.fallOffType = 0
+        self.fallOffHeight = 0.2
+        self.a = 2.2
+        self.b = 0.4
+        self.underWaterRavines = 0
+        self.mapSize = 512
+
+        #Clamp height
+        self.clampHeight = 0
+        self.minHeight = 0.0
+        self.maxHeight = 10.0
+        self.offsetX = 1.0
+        self.offsetY = 1.0
+        self.loaded = 0
+
         self.workGroupsX = x
         self.workGroupsY = y
         self.workGroupsZ = z

@@ -3,13 +3,11 @@ from pyGandalf.scene.entity import Entity
 from pyGandalf.scene.components import TerrainComponent
 from pyGandalf.scene.components import StaticMeshComponent
 from pyGandalf.scene.components import TransformComponent
-from pyGandalf.scene.components import ComputeComponent
+from pyGandalf.utilities.opengl_shader_lib import OpenGLShaderLib
 from pyGandalf.scene.components import Component
+from pyGandalf.utilities.opengl_material_lib import MaterialInstance
 import numpy as np
-import glm
 import OpenGL.GL as gl
-from PIL import Image, ImageDraw
-from pyGandalf.utilities.opengl_texture_lib import OpenGLTextureLib, TextureData
 
 class TerrainGenerationSystem(System):
     """
@@ -17,7 +15,20 @@ class TerrainGenerationSystem(System):
     """
 
     def on_create_entity(self, entity: Entity, components: Component | tuple[Component]):
-        pass
+        terrain: TerrainComponent = components[0]
+        computeCode = OpenGLShaderLib().load_from_file(terrain.shader)
+
+        compute_shader = OpenGLShaderLib().compile_shader(computeCode, gl.GL_COMPUTE_SHADER)
+        shader_program = gl.glCreateProgram()
+        gl.glAttachShader(shader_program, compute_shader)
+        gl.glLinkProgram(shader_program)
+
+        if not gl.glGetProgramiv(shader_program, gl.GL_LINK_STATUS):
+            raise RuntimeError(gl.glGetProgramInfoLog(shader_program).decode('utf-8'))
+
+        gl.glDeleteShader(compute_shader)
+
+        terrain.ID = shader_program
 
     def on_update_entity(self, ts: float, entity: Entity, components: Component | tuple[Component]):
         # NOTE: These should match the components that the system operates on, which are defined in the system instantiation.
@@ -25,13 +36,10 @@ class TerrainGenerationSystem(System):
         terrain: TerrainComponent = components[0]
         mesh: StaticMeshComponent = components[1]
         transform: TransformComponent = components[2]
-        compute: ComputeComponent = components[3]
 
-        if terrain.mapSize != compute.workGroupsX:
-            compute.workGroupsX = terrain.mapSize
-            compute.workGroupsY = terrain.mapSize
-            uniformDataIndex = list(compute.uniformsDictionary.keys()).index('mapSize')
-            compute.uniformsData[uniformDataIndex] = terrain.mapSize
+        if terrain.mapSize != terrain.workGroupsX:
+            terrain.workGroupsX = terrain.mapSize
+            terrain.workGroupsY = terrain.mapSize
 
         vertices = []
         tex_coords = []
@@ -97,3 +105,83 @@ class TerrainGenerationSystem(System):
             mesh.attributes = [terrain.vertices, tex_coords]  
             mesh.changed = True 
             terrain.generate = False
+
+        if terrain.run:
+            gl.glUseProgram(terrain.ID)
+
+            gl.glBindImageTexture(0, terrain.textures[0], 0, gl.GL_FALSE, 0, gl.GL_READ_WRITE, gl.GL_RGBA32F)
+            gl.glBindImageTexture(1, terrain.textures[1], 0, gl.GL_FALSE, 0, gl.GL_READ_WRITE, gl.GL_RGBA32F)
+            gl.glBindImageTexture(2, terrain.textures[2], 0, gl.GL_FALSE, 0, gl.GL_READ_WRITE, gl.GL_RGBA32F)
+
+            location = gl.glGetUniformLocation(terrain.ID,'scale')
+            MaterialInstance.update_uniform(MaterialInstance, location, 'scale', int(terrain.scale), 'int')
+
+            location = gl.glGetUniformLocation(terrain.ID,'frequency')
+            MaterialInstance.update_uniform(MaterialInstance, location, 'frequency', terrain.frequency, 'float')
+
+            location = gl.glGetUniformLocation(terrain.ID,'lacunarity')
+            MaterialInstance.update_uniform(MaterialInstance, location, 'lacunarity', terrain.lacunarity, 'float')
+
+            location = gl.glGetUniformLocation(terrain.ID,'persistence')
+            MaterialInstance.update_uniform(MaterialInstance, location, 'persistence', terrain.persistence, 'float')
+
+            location = gl.glGetUniformLocation(terrain.ID,'octaves')
+            MaterialInstance.update_uniform(MaterialInstance, location, 'octaves', terrain.octaves, 'int')
+
+            location = gl.glGetUniformLocation(terrain.ID,'turbulance')
+            MaterialInstance.update_uniform(MaterialInstance, location, 'turbulance', terrain.turbulance, 'int')
+
+            location = gl.glGetUniformLocation(terrain.ID,'Ridges')
+            MaterialInstance.update_uniform(MaterialInstance, location, 'Ridges', terrain.Ridges, 'int')
+
+            location = gl.glGetUniformLocation(terrain.ID,'ridgesStrength')
+            MaterialInstance.update_uniform(MaterialInstance, location, 'ridgesStrength', terrain.ridgesStrength, 'int')
+
+            location = gl.glGetUniformLocation(terrain.ID,'seed')
+            MaterialInstance.update_uniform(MaterialInstance, location, 'seed', terrain.seed, 'int')
+
+            location = gl.glGetUniformLocation(terrain.ID,'fallOffEnabled')
+            MaterialInstance.update_uniform(MaterialInstance, location, 'fallOffEnabled', terrain.fallOffEnabled, 'int')
+
+            location = gl.glGetUniformLocation(terrain.ID,'fallOffType')
+            MaterialInstance.update_uniform(MaterialInstance, location, 'fallOffType', terrain.fallOffType, 'int')
+
+            location = gl.glGetUniformLocation(terrain.ID,'fallOffHeight')
+            MaterialInstance.update_uniform(MaterialInstance, location, 'fallOffHeight', terrain.fallOffHeight, 'float')
+
+            location = gl.glGetUniformLocation(terrain.ID,'a')
+            MaterialInstance.update_uniform(MaterialInstance, location, 'a', terrain.a, 'float')
+
+            location = gl.glGetUniformLocation(terrain.ID,'b')
+            MaterialInstance.update_uniform(MaterialInstance, location, 'b', terrain.b, 'float')
+
+            location = gl.glGetUniformLocation(terrain.ID,'underWaterRavines')
+            MaterialInstance.update_uniform(MaterialInstance, location, 'underWaterRavines', terrain.underWaterRavines, 'int')
+
+            location = gl.glGetUniformLocation(terrain.ID, 'cameraCoords')
+            MaterialInstance.update_uniform(MaterialInstance, location, 'cameraCoords', terrain.cameraCoords, 'vec2')
+
+            location = gl.glGetUniformLocation(terrain.ID, 'mapSize')
+            MaterialInstance.update_uniform(MaterialInstance, location, 'mapSize', terrain.mapSize, 'int')
+
+            location = gl.glGetUniformLocation(terrain.ID, 'clampHeight')
+            MaterialInstance.update_uniform(MaterialInstance, location, 'clampHeight', terrain.clampHeight, 'int')
+
+            location = gl.glGetUniformLocation(terrain.ID, 'minHeight')
+            MaterialInstance.update_uniform(MaterialInstance, location, 'minHeight', terrain.minHeight, 'float')
+
+            location = gl.glGetUniformLocation(terrain.ID, 'maxHeight')
+            MaterialInstance.update_uniform(MaterialInstance, location, 'maxHeight', terrain.maxHeight, 'float')
+
+            location = gl.glGetUniformLocation(terrain.ID, 'offsetX')
+            MaterialInstance.update_uniform(MaterialInstance, location, 'offsetX', terrain.offsetX, 'float')
+
+            location = gl.glGetUniformLocation(terrain.ID, 'offsetY')
+            MaterialInstance.update_uniform(MaterialInstance, location, 'offsetY', terrain.offsetY, 'float')
+
+            location = gl.glGetUniformLocation(terrain.ID, 'loaded')
+            MaterialInstance.update_uniform(MaterialInstance, location, 'loaded', terrain.loaded, 'int')
+
+            gl.glDispatchCompute(terrain.workGroupsX, terrain.workGroupsY, terrain.workGroupsZ)
+            gl.glMemoryBarrier(gl.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT)
+            gl.glUseProgram(0)
