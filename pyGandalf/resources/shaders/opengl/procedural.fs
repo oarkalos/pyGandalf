@@ -1,6 +1,7 @@
 #version 430 core
 
 in vec3 v_Position;
+in vec3 objectSpacePos;
 in vec3 v_Normal;
 in vec2 v_TexCoord;
 
@@ -44,7 +45,7 @@ uniform vec3 u_LightPositions[16];
 uniform vec3 u_LightColors[16];
 
 //Terrain shading parameters
-uniform float _Height_of_blend;
+float _Height_of_blend = 1.0;
 uniform float _Depth;
 uniform float maxHeight;
 uniform float heightOfSnow;
@@ -187,7 +188,7 @@ vec4 PBR(vec3 albedo, vec3 normal, float met, float rough, float ambientOcc){
 vec3 HeightSplattingValues(float snowHeight, float grassHeight){
     //Lerp values
     vec3 values;
-    float heightInRange = invLerp(0.0, maxHeight, v_Position.y);
+    float heightInRange = invLerp(0.0, maxHeight, objectSpacePos.y);
 
     //x above snow
     values.x = invLerp(snowHeight, 1.0, heightInRange);
@@ -202,6 +203,8 @@ vec3 HeightSplattingValues(float snowHeight, float grassHeight){
 vec4 HeightSplatting(vec4 Color1, vec4 Color2, float frac){
     float opac1 = _Height_of_blend - frac;
     float opac2 = frac;
+    Color1.a = (Color1.r + Color1.g + Color1.b) / 3.0;
+    Color2.a = (Color2.r + Color2.g + Color2.b) / 3.0;
     float ma = max(Color1.a+ opac1, Color2.a + opac2) - _Depth;
 
     float b1 = max(Color1.a+ opac1 - ma, 0);
@@ -212,16 +215,14 @@ vec4 HeightSplatting(vec4 Color1, vec4 Color2, float frac){
 
 float SlopeBlending(float Slope, float BlendAmount, float NormalY){
     float slope = 1-NormalY; // slope = 0 when terrain is completely flat
-    float grassBlendHeight = Slope* (1-BlendAmount);
-    return 1 - clamp((slope-grassBlendHeight)/(Slope-grassBlendHeight), 0.0, 1.0);
+    return 1 - clamp(slope/Slope, 0.0, 1.0);
 }
 
 vec2 Bombing(vec2 UVS){
-    vec2 floorUVS = floor(UVS);
-    vec3 p3 = fract(floorUVS.xyx * vec3(0.1031, 0.1030, 0.0973));
+    vec3 p3 = fract(UVS.xyx * vec3(0.1031, 0.1030, 0.0973));
 
     p3 += dot(p3, p3.yzx + 33.33);
-    return fract((p3.xx + p3.yz) * p3.zy) + UVS;
+    return fract((p3.xx + p3.yz) * p3.zy);
 }
 
 vec4 UVSBombimg1(){

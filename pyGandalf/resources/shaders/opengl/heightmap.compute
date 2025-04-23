@@ -124,13 +124,13 @@ float ApplyFallOff(float x, float z, float height){
   h = pow(distFromCenter, a) / (pow(distFromCenter, a) + pow(b - b * distFromCenter, a));
   if(height > fallOffHeight){
       return mix(height, fallOffHeight, h);
-  }else{
-      float clampedHeight = height;
-      if(underWaterRavines == 0){
-        clampedHeight = fallOffHeight;
-      }
-      return mix(height, clampedHeight, h);
   }
+  
+  float clampedHeight = height;
+  if(underWaterRavines == 0){
+    clampedHeight = fallOffHeight;
+  }
+  return mix(height, clampedHeight, h);
 }
 
 float fractalPerlinNoise(float x, float z){
@@ -141,7 +141,7 @@ float fractalPerlinNoise(float x, float z){
     for(int i = 0; i < octaves; i++){
         float xCoord = (x * tmpFrequency / 64) + seed * 0.83;
         float zCoord = (z * tmpFrequency / 64) + seed * 23.097;
-        float distFormCenter = snoise(vec2(xCoord, zCoord));
+        float distFormCenter = cnoise(vec2(xCoord, zCoord));
 
         if(turbulance == 1){
           distFormCenter = abs(distFormCenter);

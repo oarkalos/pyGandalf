@@ -429,8 +429,9 @@ class EditorPanelSystem(System):
                         material.instance.data.scale = terrain.scale
                     if material.instance.has_uniform('elevationScale'):
                         material.instance.data.elevationScale = terrain.elevationScale
-                    if material.instance.has_uniform('mapSize'):
-                        material.instance.data.mapSize = terrain.mapSize / 8
+                    if terrain.run:
+                        if material.instance.has_uniform('mapSize'):
+                            material.instance.data.mapSize = terrain.mapSize / 8
                     if material.instance.has_uniform('cameraCoords'):
                         material.instance.data.cameraCoords = terrain.cameraCoords
                     if material.instance.has_uniform('generate'):
@@ -550,10 +551,6 @@ class EditorPanelSystem(System):
                     if material.instance.has_uniform('useTextures'):
                         useTextures_changed, new_useTextures = imgui.checkbox('useTextures', material.instance.data.useTextures)
                         if useTextures_changed: material.instance.data.useTextures = new_useTextures
-
-                    if material.instance.has_uniform('_Height_of_blend'):
-                        height_of_blend_changed, new_height_of_blend = imgui.drag_float('_Height_of_blend', material.instance.data.heightOfBlend, 0.01, 0.0, 10.0)
-                        if height_of_blend_changed: material.instance.data.heightOfBlend = new_height_of_blend
 
                     if material.instance.has_uniform('_Depth'):
                         depth_changed, new_depth = imgui.drag_float('_Depth', material.instance.data.depthOfBlend, 0.01, 0.0, 10.0)

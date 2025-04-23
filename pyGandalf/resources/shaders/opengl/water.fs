@@ -44,7 +44,7 @@ void main(){
     float smoothFactor = clamp(waterDepth / 20.0, 0.0, 1.0);
 
     vec2 distortedTexCoords = texture(dudvMap, vec2(texCoord.x + offset, texCoord.y)).rg * 0.1;
-    distortedTexCoords = texCoord + vec2(distortedTexCoords.x, +distortedTexCoords.y + offset);
+    distortedTexCoords = texCoord + vec2(distortedTexCoords.x, distortedTexCoords.y + offset);
 
     vec2 totalDistortion = (texture(dudvMap, distortedTexCoords).rg * 2.0 - 1.0) * waveStrength * smoothFactor;
 
@@ -73,11 +73,7 @@ void main(){
     specular = pow(specular, shineDamper);
     vec3 specularHighlights = u_LightColors[0] * specular * reflectivity * smoothFactor;
 
-    float edgeFactor = clamp(smoothFactor, 0.0, 0.1);
-    edgeFactor = invLerp(0.0, 0.1, edgeFactor);
-
     color = mix(reflectionColor, refractionColor, fresnelFactor);
     color = mix(color, vec4(0.0, 0.3, 0.5, 1.0), 0.3) + vec4(specularHighlights, 0.0);
-    color = mix(vec4(1.0, 1.0, 1.0, 1.0), color, edgeFactor);
     color.a = clamp(waterDepth / 5.0, 0.0, 1.0);
 }

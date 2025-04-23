@@ -162,7 +162,7 @@ class MyOpenGLRenderingSystem(System):
 
     def on_update_system(self, ts: float):
         if not (self.water == None):
-            self.waterPlane = SceneManager().get_active_scene().get_component(self.water, TransformComponent).translation.y + 0.05
+            self.waterPlane = SceneManager().get_active_scene().get_component(self.water, TransformComponent).get_world_position().y + 0.05
         for components in self.get_filtered_components():
             mesh, entity_material, transform = components
             if mesh.changed:
@@ -465,9 +465,6 @@ class MyOpenGLRenderingSystem(System):
             self.offset += self.wave_speed * Application().delta_time
             self.offset %= 1
             material.instance.set_uniform('offset', self.offset)
-
-        if material.instance.has_uniform('_Height_of_blend'):
-            material.instance.set_uniform('_Height_of_blend', material.instance.data.heightOfBlend)
 
         if material.instance.has_uniform('_Depth'):
             material.instance.set_uniform('_Depth', material.instance.data.depthOfBlend)

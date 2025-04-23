@@ -24,6 +24,7 @@ in vec2 v_TextureCoord[];
 
 // send to Fragment Shader for coloring
 out vec3 v_Position;
+out vec3 objectSpacePos;
 out vec3 v_Normal;
 out vec2 v_TexCoord;
 
@@ -71,11 +72,13 @@ void main()
     heightMapCoords.y = (float(mapSize) / 64.0) * texCoord.y;
     height = texture(imgOutput, heightMapCoords).y;
 
+    float offset = 1.0/mapSize;
+
     if(generate == 1){
-        float heightR = texture(imgOutput, vec2(heightMapCoords.x + 1.0/mapSize, heightMapCoords.y)).y;
-        float heightB = texture(imgOutput, vec2(heightMapCoords.x, heightMapCoords.y + 1.0/mapSize)).y;
-        float heightT = texture(imgOutput, vec2(heightMapCoords.x, heightMapCoords.y - 1.0/mapSize)).y;
-        float heightL = texture(imgOutput, vec2(heightMapCoords.x - 1.0/mapSize, heightMapCoords.y)).y;
+        float heightR = texture(imgOutput, vec2(heightMapCoords.x + offset, heightMapCoords.y)).y;
+        float heightB = texture(imgOutput, vec2(heightMapCoords.x, heightMapCoords.y + offset)).y;
+        float heightT = texture(imgOutput, vec2(heightMapCoords.x, heightMapCoords.y - offset)).y;
+        float heightL = texture(imgOutput, vec2(heightMapCoords.x - offset, heightMapCoords.y)).y;
 
         vec3 vecX = vec3(2, (heightR - heightL) * elevationScale, 0);
         vec3 vecY = vec3(0, (heightT - heightB) * elevationScale, -2);
@@ -90,6 +93,7 @@ void main()
 
     // displace point along normal
     p += normal * height * elevationScale;
+    objectSpacePos = p.xyz;
 
     // ----------------------------------------------------------------------
     // output patch point position in clip space

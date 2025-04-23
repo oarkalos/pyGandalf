@@ -268,9 +268,6 @@ class OpenGLStaticMeshRenderingSystem(System):
         if material.instance.has_uniform('ao'):
             material.instance.set_uniform('ao', material.instance.data.ao)
 
-        if material.instance.has_uniform('_Height_of_blend'):
-            material.instance.set_uniform('_Height_of_blend', material.instance.data.heightOfBlend)
-
         if material.instance.has_uniform('_Depth'):
             material.instance.set_uniform('_Depth', material.instance.data.depthOfBlend)
 

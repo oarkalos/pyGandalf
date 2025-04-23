@@ -4,11 +4,11 @@ from pyGandalf.scene.entity import Entity
 from pyGandalf.scene.components import Component, ErosionComponent
 from pyGandalf.utilities.opengl_shader_lib import OpenGLShaderLib
 from pyGandalf.utilities.opengl_texture_lib import OpenGLTextureLib
-from pyGandalf.utilities.opengl_material_lib import MaterialInstance
 from pyGandalf.utilities.definitions import SHADERS_PATH
 from PIL import Image, ImageDraw
 from os import path
 
+import math
 class ErosionSystem(System):
 
     def compile_compute(self, computeCode):
@@ -68,6 +68,8 @@ class ErosionSystem(System):
         draw = ImageDraw.ImageDraw(image)
         for z in range(heightmap.shape[0]):
             for x in range(heightmap.shape[1]):
+                if math.isnan(heightmap[z][x][1]):
+                    heightmap[z][x][1] = 0.0
                 draw.point((z, x), (int(heightmap[z][x][1] * 255), int(heightmap[z][x][1] * 255), int(heightmap[z][x][1] * 255)))
         image.save(filename)
         print(filename, "saved")

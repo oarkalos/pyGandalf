@@ -156,7 +156,7 @@ class TerrainComponent(Component):
         self.uniformsDictionary: dict[str, str] = {}
 
         #Noise settings
-        self.frequency = 0.1
+        self.frequency = 0.5
         self.lacunarity = 2.0
         self.persistence = 0.5
         self.octaves = 12
@@ -201,28 +201,6 @@ class ErosionComponent(Component):
 
         #Compute shaders ids
         self.erosionId: int = 0
-
-        #Fluid simulation
-        self.timeDelta = 0.5
-        self.pipeArea = 5.0
-        self.pipeLength = 1.0
-        self.gravity = 9.81
-        self.cellSize = glm.vec2(1.0, 1.0)
-        self.evaporation = 0.0
-        self.rainRate = 0.0
-
-        #Hydraulic erosion
-        self.sedimentCapacity = 0.1
-        self.maxErosionDepth = 1.0
-        self.suspensionRate = 0.8
-        self.depositionRate = 0.8
-        self.sedimentSofteningRate = 5.0
-
-        #Thermal erosion
-        self.thermalErosionTimeScale = 20.0
-        self.thermalErosionRate = 1.0
-        self.tangentCoeff = 0.6
-        self.tangentBias = 0.2
 
         self.save = False
         self.enabled = False

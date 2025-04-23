@@ -231,8 +231,7 @@ class MaterialData:
         self.metallic = 0.0
         self.roughness = 0.6
         self.ao = 1.0
-        self.heightOfBlend = 0.6
-        self.depthOfBlend = 1.05
+        self.depthOfBlend = 0.2
         self.maxHeight = 60.0
         self.heightOfSnow = 0.9
         self.heightOfGrass = 0.03
