@@ -1,7 +1,7 @@
 import OpenGL.GL as gl
 from pyGandalf.systems.system import System
 from pyGandalf.scene.entity import Entity
-from pyGandalf.scene.components import Component, ErosionComponent
+from pyGandalf.scene.components import Component, ErosionComponent, TerrainComponent
 from pyGandalf.utilities.opengl_shader_lib import OpenGLShaderLib
 from pyGandalf.utilities.opengl_texture_lib import OpenGLTextureLib
 from pyGandalf.utilities.definitions import SHADERS_PATH
@@ -24,31 +24,35 @@ class ErosionSystem(System):
         return shader_program
 
     def on_create_entity(self, entity: Entity, components: Component | tuple[Component]):
-        settings: ErosionComponent = components
+        settings: ErosionComponent = components[0]
         erosionCode = OpenGLShaderLib().load_from_file(SHADERS_PATH / 'opengl' / 'erosion.compute')
 
         settings.erosionId = self.compile_compute(erosionCode)
 
     def on_update_entity(self, ts: float, entity: Entity, components: Component | tuple[Component]):
-        erosion: ErosionComponent = components
+        erosion: ErosionComponent = components[0]
+        terrain: TerrainComponent = components[1]
 
         if erosion.enabled:
-            gl.glBindImageTexture(0, erosion.heightmapId, 0, gl.GL_FALSE, 0, gl.GL_READ_WRITE, gl.GL_RGBA32F)
-            gl.glBindImageTexture(1, erosion.dropsPosSpeedId, 0, gl.GL_FALSE, 0, gl.GL_READ_WRITE, gl.GL_RGBA32F)
-            gl.glBindImageTexture(2, erosion.dropsVolSedId, 0, gl.GL_FALSE, 0, gl.GL_READ_WRITE, gl.GL_RGBA32F)
-            gl.glBindImageTexture(3, erosion.normalsId, 0, gl.GL_FALSE, 0, gl.GL_READ_WRITE, gl.GL_RGBA32F)
+            if erosion.counter % 2 == 0: 
+                gl.glBindImageTexture(0, erosion.heightmapId, 0, gl.GL_FALSE, 0, gl.GL_READ_WRITE, gl.GL_RGBA32F)
+                gl.glBindImageTexture(1, erosion.dropsPosSpeedId, 0, gl.GL_FALSE, 0, gl.GL_READ_WRITE, gl.GL_RGBA32F)
+                gl.glBindImageTexture(2, erosion.dropsVolSedId, 0, gl.GL_FALSE, 0, gl.GL_READ_WRITE, gl.GL_RGBA32F)
+                gl.glBindImageTexture(3, erosion.normalsId, 0, gl.GL_FALSE, 0, gl.GL_READ_WRITE, gl.GL_RGBA32F)
 
-            gl.glUseProgram(erosion.erosionId)
-            location = gl.glGetUniformLocation(erosion.erosionId, 'started')
-            gl.glUniform1i(location, erosion.started)
+                gl.glUseProgram(erosion.erosionId)
+                location = gl.glGetUniformLocation(erosion.erosionId, 'started')
+                gl.glUniform1i(location, erosion.started)
+                location = gl.glGetUniformLocation(erosion.erosionId, 'elevationScale')
+                gl.glUniform1i(location, terrain.elevationScale)
 
-            gl.glDispatchCompute(erosion.width, erosion.height, 1)
-            gl.glMemoryBarrier(gl.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT)
-            gl.glUseProgram(0)
+                gl.glDispatchCompute(erosion.width, erosion.height, 1)
+                gl.glMemoryBarrier(gl.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT)
+                gl.glUseProgram(0)
 
             erosion.counter += 1
             erosion.started = 1
-            if erosion.counter == 500:
+            if erosion.counter == 1000:
                 erosion.enabled = False
 
         if erosion.save:

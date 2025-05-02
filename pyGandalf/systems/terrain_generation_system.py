@@ -116,6 +116,9 @@ class TerrainGenerationSystem(System):
             location = gl.glGetUniformLocation(terrain.ID,'scale')
             MaterialInstance.update_uniform(MaterialInstance, location, 'scale', int(terrain.scale), 'int')
 
+            location = gl.glGetUniformLocation(terrain.ID, 'elevationScale')
+            MaterialInstance.update_uniform(MaterialInstance, location, 'elevationScale', terrain.elevationScale, 'int')
+
             location = gl.glGetUniformLocation(terrain.ID,'frequency')
             MaterialInstance.update_uniform(MaterialInstance, location, 'frequency', terrain.frequency, 'float')
 

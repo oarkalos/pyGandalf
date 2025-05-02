@@ -197,7 +197,7 @@ def main():
     scene.register_system(CameraSystem([CameraComponent, TransformComponent]))
     scene.register_system(LightSystem([LightComponent, TransformComponent]))
     scene.register_system(TerrainGenerationSystem([TerrainComponent, StaticMeshComponent, TransformComponent]))
-    scene.register_system(ErosionSystem([ErosionComponent]))
+    scene.register_system(ErosionSystem([ErosionComponent, TerrainComponent]))
     scene.register_system(MyOpenGLRenderingSystem([StaticMeshComponent, MaterialComponent, TransformComponent]))
     scene.register_system(CameraControllerSystem([CameraControllerComponent, CameraComponent, TransformComponent]))
 
