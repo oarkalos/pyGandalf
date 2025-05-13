@@ -242,6 +242,7 @@ vec2 UVSBombimgLerValue(){
     return smoothstep(vec2(0.25, 0.25), vec2(0.75, 0.75), abs(tmp));
 }
 
+//Perform texture bombing for all textures (albedo, normal, mask) by sampling each one 4 times and blending between them
 vec4 calculateAlbedo(vec3 values, vec2 UVS1, vec2 UVS2, vec2 UVS3, vec2 UVS4, vec2 lerpValues){
     vec4 grassColor = mix(mix(texture(grassAlbedo, UVS1), texture(grassAlbedo, UVS2), lerpValues.r), mix(texture(grassAlbedo, UVS3), texture(grassAlbedo, UVS4), lerpValues.r), lerpValues.g);
     grassColor += vec4(0.0, 0.3, 0.0, 0.0);
@@ -267,8 +268,10 @@ vec4 calculateMask(vec3 values, vec2 UVS1, vec2 UVS2, vec2 UVS3, vec2 UVS4, vec2
 
 void main()
 {
+    //Discard everything below water plane for the reflection pass
     if((clip == 1) && (v_Position.y < waterPlane)){
         discard;
+    //Discard everything above water plane for the refraction pass
     }else if((clip == 2) && (v_Position.y > waterPlane)){
         discard;
     }

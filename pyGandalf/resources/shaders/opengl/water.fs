@@ -36,9 +36,11 @@ void main(){
     float nearPlane = 0.1;
     float farPlane = 2000.0;
     float depth = texture(depthMap, refractionCoords).r;
+    //Convert depth of water to distance. Taken from https://stackoverflow.com/questions/6652253/getting-the-true-z-value-from-the-depth-buffer
     float floorDistance = 2.0 * nearPlane * farPlane / (farPlane + nearPlane - (2.0 * depth - 1.0) * (farPlane - nearPlane));
 
     depth = gl_FragCoord.z;
+    //Convert z-buffer depth to distance. Taken from https://stackoverflow.com/questions/6652253/getting-the-true-z-value-from-the-depth-buffer
     float waterDistance = 2.0 * nearPlane * farPlane / (farPlane + nearPlane - (2.0 * depth - 1.0) * (farPlane - nearPlane));
     float waterDepth = floorDistance - waterDistance;
     float smoothFactor = clamp(waterDepth / 20.0, 0.0, 1.0);
@@ -62,6 +64,9 @@ void main(){
     vec3 normal = vec3(normalColour.r * 2.0 - 1.0, normalColour.b * 3.0, normalColour * 2.0 - 1.0);
     normal = normalize(normal);
 
+    //Calculate fresnel factor by taking the dot product of the view vector and the normal
+    //If we are looking straight down to the water, the dot product will be closer to 1 and 
+    //we will have more refraction.
     vec3 viewVector = normalize(toCameraVector);
     float fresnelFactor = dot(viewVector, normal);
     fresnelFactor = pow(fresnelFactor, 0.5);
@@ -73,6 +78,7 @@ void main(){
     specular = pow(specular, shineDamper);
     vec3 specularHighlights = u_LightColors[0] * specular * reflectivity * smoothFactor;
 
+    //Mix based on fresnel factor
     color = mix(reflectionColor, refractionColor, fresnelFactor);
     color = mix(color, vec4(0.0, 0.3, 0.5, 1.0), 0.3) + vec4(specularHighlights, 0.0);
     color.a = clamp(waterDepth / 5.0, 0.0, 1.0);

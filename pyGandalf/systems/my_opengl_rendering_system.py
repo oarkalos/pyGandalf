@@ -218,6 +218,7 @@ class MyOpenGLRenderingSystem(System):
         gl.glBindFramebuffer(gl.GL_FRAMEBUFFER, self.reflection_frameBuffer_id)
         gl.glClear(gl.GL_DEPTH_BUFFER_BIT)
 
+        #Mirror the camera in the water plane
         main_camera = SceneManager().get_main_camera_entity()
         camera_transform = SceneManager().get_active_scene().get_component(main_camera, TransformComponent)
         camera_controller = SceneManager().get_active_scene().get_component(main_camera, CameraControllerComponent)
@@ -263,6 +264,7 @@ class MyOpenGLRenderingSystem(System):
             OpenGLRenderer().resize(Application().get_window().width, Application().get_window().height)
         gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
 
+        #Move camera back to its original position
         camera_transform.translation = glm.vec3(camera_transform.translation.x, camera_transform.translation.y + distance, camera_transform.translation.z)
         self.inevrtCamera(camera_controller.pitch)
         

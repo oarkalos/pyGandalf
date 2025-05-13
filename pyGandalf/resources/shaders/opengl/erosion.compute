@@ -80,27 +80,36 @@ void main(){
         ipos = ivec2(drop.position);
         vec3 normal = SurfaceNormal(ipos);
 
+        //Classical mechanics:
+        //dv / dt = a,  F = ma => a = F / m, m = volume * density and the force F is in the normal direction
         drop.speed += dt * normal.xz / (drop.volume * density);
+        //dx / dt = v
         drop.position += dt * drop.speed;
+        //Slow down droplet due to friction
         drop.speed *= (1.0 - dt * friction);
 
+        //If droplet is out of bounds then stop
         if((drop.position.x < 0.0) || (drop.position.y < 0.0) || (drop.position.x > 512) || (drop.position.y > 512)){
             break; 
         } 
 
         height = imageLoad(heightmap, ipos) * elevationScale;
 
+        //The equilibrium concentration is higher if we are moving downhill and if we are moving faster and proportional to the particle volume
         c_eq = max(0.0, drop.volume * length(drop.speed) * (height.y - imageLoad(heightmap, ivec2(drop.position.x, drop.position.y)).y * elevationScale));
             
         float c_diff = c_eq - drop.sediment;
+        //If the equilibrium concentration is higher than the current concentration then the particle absorbs sediment
         float incSediment = dt * deposition * c_diff;
         drop.sediment += incSediment;
         height.y -= drop.volume * incSediment;
             
+        //Some volume is evaporated
         drop.volume *= (1.0 - dt * evaporation);
         imageStore(heightmap, ipos, height / elevationScale);
     }
 
+    //Calculate normals. It is not necessary todo that here but its done for neural PRT
     float heightR = imageLoad(heightmap, ivec2(texelCoord.x + 1, texelCoord.y)).y;
     float heightL = imageLoad(heightmap, ivec2(texelCoord.x - 1, texelCoord.y)).y;
     float heightB = imageLoad(heightmap, ivec2(texelCoord.x, texelCoord.y + 1)).y;

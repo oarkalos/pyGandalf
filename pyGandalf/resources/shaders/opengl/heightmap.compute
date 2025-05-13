@@ -174,8 +174,11 @@ float fractalPerlinNoise(float x, float z){
 void main() {
     vec4 value = vec4(0.0, 0.0, 0.0, 1.0);
     ivec2 texelCoord = ivec2(gl_GlobalInvocationID.xy);
-    float range = 512.0 / mapSize;
-    vec2 ftexelCoord = vec2(texelCoord) * range;
+
+    //We always must sample from the same range which 0 to 512 at maximum.
+    //If the mapSize happens to be 256 we will need 256 equally spaced sample points
+    //from 0 to 512 NOT from 0 to 256.
+    vec2 ftexelCoord = vec2(texelCoord) * 512.0 / mapSize;
     ftexelCoord += cameraCoords;
 
     float height = 0.0;
@@ -183,15 +186,18 @@ void main() {
     if(loaded == 0){
       height = fractalPerlinNoise(ftexelCoord.x, ftexelCoord.y) / 2.0;
     }else{
+      //Imported heightmap may not be the same size as 512x512
       ivec2 coords = ivec2(ceil(offsetX) * (texelCoord.x * 512) / mapSize, ceil(offsetY) * (texelCoord.y * 512) / mapSize);
       height = imageLoad(loadedHeightmap, coords).r;
     }
 
+    //Store the full position of the terrain. This is done for neural PRT but it may not work
     value.x = (((float(texelCoord.x)) * 175.0) / 511.0) - 100.0;
     value.y = height;
     value.z = (((float(texelCoord.y)) * 175.0) / 511.0) - 100.0;
     imageStore(imgOutput, texelCoord, value);
 
+    //Calculate normals. It is not necessary todo that here but its done for neural PRT
     float heightR = imageLoad(imgOutput, ivec2(texelCoord.x + 1, texelCoord.y)).y;
     float heightL = imageLoad(imgOutput, ivec2(texelCoord.x - 1, texelCoord.y)).y;
     float heightB = imageLoad(imgOutput, ivec2(texelCoord.x, texelCoord.y + 1)).y;

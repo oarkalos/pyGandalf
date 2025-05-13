@@ -37,6 +37,7 @@ class TerrainGenerationSystem(System):
         mesh: StaticMeshComponent = components[1]
         transform: TransformComponent = components[2]
 
+        #Make sure the number of threads in the compute shader is the same with the heightmap resolution
         if terrain.mapSize != terrain.workGroupsX:
             terrain.workGroupsX = terrain.mapSize
             terrain.workGroupsY = terrain.mapSize
@@ -44,6 +45,7 @@ class TerrainGenerationSystem(System):
         vertices = []
         tex_coords = []
 
+        #Update camera coordinates
         if terrain.cameraMoved:
             if not terrain.erode:
                 transform.translation.x = terrain.cameraCoords.x
@@ -53,9 +55,13 @@ class TerrainGenerationSystem(System):
         if terrain.generate:
             width, height = (terrain.scale, terrain.scale)
 
+            #Create the grid. Every patch has 4 vertices
+            #The grid goes from -terrain.scale / 2 to terrain.scale / 2, in order
+            #to have the point (0,0) in its center
             for i in range(terrain.patch_resolution):
                 for j in range(terrain.patch_resolution):
                     vertex = []
+                    #Top left
                     vertex.append((-width / 2.0 + width * i / float(terrain.patch_resolution)))  # v.x
                     vertex.append(0.0)  # v.y
                     vertex.append(-height / 2.0 + height * j / float(terrain.patch_resolution))  # v.z
@@ -66,6 +72,7 @@ class TerrainGenerationSystem(System):
                     tex_coord.append(j / float(terrain.patch_resolution))  # v
                     tex_coords.append(tex_coord)
 
+                    #Top right
                     vertex = []
                     vertex.append((-width / 2.0 + width * (i + 1) / float(terrain.patch_resolution)) )  # v.x
                     vertex.append(0.0)  # v.y
@@ -77,6 +84,7 @@ class TerrainGenerationSystem(System):
                     tex_coord.append(j / float(terrain.patch_resolution))  # v
                     tex_coords.append(tex_coord)
 
+                    #Bottom left
                     vertex = []
                     vertex.append((-width / 2.0 + width * i / float(terrain.patch_resolution))  )  # v.x
                     vertex.append(0.0)  # v.y
@@ -88,6 +96,7 @@ class TerrainGenerationSystem(System):
                     tex_coord.append((j + 1) / float(terrain.patch_resolution))  # v
                     tex_coords.append(tex_coord)
 
+                    #Bottom right
                     vertex = []
                     vertex.append((-width / 2.0 + width * (i + 1) / float(terrain.patch_resolution))  )  # v.x
                     vertex.append(0.0)  # v.y

@@ -74,6 +74,7 @@ void main()
 
     float offset = 1.0/mapSize;
 
+    // Calculate normals here or sample them from texture if erosion is enabled
     if(generate == 1){
         float heightR = texture(imgOutput, vec2(heightMapCoords.x + offset, heightMapCoords.y)).y;
         float heightB = texture(imgOutput, vec2(heightMapCoords.x, heightMapCoords.y + offset)).y;
